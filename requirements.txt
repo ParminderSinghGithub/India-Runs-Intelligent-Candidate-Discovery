@@ -1,0 +1,3 @@
+# India Runs Data & AI Challenge - Dependencies
+# No external packages required at this foundation stage.
+# All current modules use Python standard library only.
