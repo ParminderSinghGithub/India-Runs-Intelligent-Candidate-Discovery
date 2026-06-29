@@ -3,7 +3,6 @@
 import sys
 from pathlib import Path
 
-import src
 from src.config import (
     PROJECT_ROOT,
     SRC_DIR,
@@ -12,6 +11,7 @@ from src.config import (
     OUTPUTS_DIR,
 )
 from src.utils import setup_logging
+from src.parser.candidate_parser import CandidateParser
 
 
 def print_banner() -> None:
@@ -70,7 +70,43 @@ def main() -> int:
         return 1
 
     print("\n✓ Project structure verified")
-    print("\nPipeline foundation ready. Awaiting further implementation.")
+
+    # Test parser with sample data
+    print("\nTesting CandidateParser...")
+    sample_file = PROJECT_ROOT / "sample_candidates.json"
+
+    if not sample_file.exists():
+        print(f"⚠ Sample file not found: {sample_file}")
+        print("Pipeline ready. Parser module implemented.")
+        return 0
+
+    try:
+        parser = CandidateParser()
+        candidates = parser.parse_many(sample_file)
+
+        if candidates:
+            candidate = candidates[0]
+            print(f"\n✓ Successfully parsed {len(candidates)} candidate(s)")
+            print(f"\nSample Candidate Summary:")
+            print(f"  ID: {candidate.candidate_id}")
+            print(f"  Name: {candidate.profile.anonymized_name}")
+            print(f"  Title: {candidate.profile.current_title}")
+            print(f"  Company: {candidate.profile.current_company}")
+            print(f"  Experience: {candidate.profile.years_of_experience} years")
+            print(f"  Jobs: {len(candidate.career_history)}")
+            print(f"  Skills: {len(candidate.skills)}")
+            print(f"  Education: {len(candidate.education)}")
+            print(f"  Languages: {len(candidate.languages)}")
+            print(f"  Certifications: {len(candidate.certifications)}")
+            print(f"\n✓ Parser module working correctly")
+        else:
+            print("⚠ No candidates parsed from sample file")
+
+    except Exception as e:
+        print(f"✗ Parser test failed: {e}")
+        return 1
+
+    print("\nPipeline ready. Parser module implemented.")
     return 0
 
 

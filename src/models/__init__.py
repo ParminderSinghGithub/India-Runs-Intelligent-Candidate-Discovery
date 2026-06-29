@@ -6,6 +6,10 @@ from .skill import Skill
 from .behavior import Behavior
 from .education import Education
 from .job_description import JobDescription
+from .profile import Profile
+from .certification import Certification
+from .language import Language
+from .redrob_signals import RedrobSignals, SalaryRange
 
 __all__ = [
     "Candidate",
@@ -14,4 +18,9 @@ __all__ = [
     "Behavior",
     "Education",
     "JobDescription",
+    "Profile",
+    "Certification",
+    "Language",
+    "RedrobSignals",
+    "SalaryRange",
 ]

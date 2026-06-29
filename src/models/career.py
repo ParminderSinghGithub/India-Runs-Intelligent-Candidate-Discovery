@@ -1,6 +1,7 @@
 """Career domain model."""
 
 from dataclasses import dataclass
+from datetime import date
 from typing import Optional
 
 
@@ -9,8 +10,11 @@ class Career:
     """Represents a candidate's career history."""
 
     company: str
-    position: str
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
-    description: Optional[str] = None
+    title: str
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    duration_months: Optional[int] = None
     is_current: bool = False
+    industry: Optional[str] = None
+    company_size: Optional[str] = None
+    description: Optional[str] = None

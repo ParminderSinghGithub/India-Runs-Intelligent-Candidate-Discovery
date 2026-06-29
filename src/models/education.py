@@ -10,7 +10,8 @@ class Education:
 
     institution: str
     degree: str
-    field_of_study: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
-    gpa: Optional[float] = None
+    field_of_study: str
+    start_year: int
+    end_year: int
+    grade: Optional[str] = None
+    tier: Optional[str] = None
