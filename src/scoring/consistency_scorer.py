@@ -1,10 +1,9 @@
 """Consistency scorer interface."""
 
 from abc import abstractmethod
-from typing import Any
 
-from src.models.candidate import Candidate
-from src.models.job_description import JobDescription
+from src.models.score_result import ScoreResult
+from src.models.scoring_context import ScoringContext
 from .base_scorer import BaseScorer
 
 
@@ -12,39 +11,13 @@ class ConsistencyScorer(BaseScorer):
     """Abstract scorer for evaluating profile consistency."""
 
     @abstractmethod
-    def score(
-        self,
-        candidate: Candidate,
-        job_description: JobDescription,
-        **kwargs: Any,
-    ) -> float:
+    def score(self, context: ScoringContext) -> ScoreResult:
         """Calculate consistency score for candidate profile.
 
         Args:
-            candidate: Candidate object.
-            job_description: Job description object.
-            **kwargs: Additional scoring parameters.
+            context: ScoringContext containing candidate and job description.
 
         Returns:
-            float: Consistency score between 0.0 and 1.0.
-        """
-        pass
-
-    @abstractmethod
-    def validate_inputs(
-        self,
-        candidate: Candidate,
-        job_description: JobDescription,
-        **kwargs: Any,
-    ) -> bool:
-        """Validate inputs for consistency scoring.
-
-        Args:
-            candidate: Candidate object.
-            job_description: Job description object.
-            **kwargs: Additional parameters to validate.
-
-        Returns:
-            bool: True if inputs are valid.
+            ScoreResult: Consistency score with details.
         """
         pass

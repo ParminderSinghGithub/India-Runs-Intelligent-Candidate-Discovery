@@ -26,9 +26,18 @@ LOG_DATE_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S"
 # Scoring weights (placeholders for now)
 CAREER_WEIGHT: Final[float] = 0.25
 SKILL_WEIGHT: Final[float] = 0.25
-BEHAVIOR_WEIGHT: Final[float] = 0.25
-SEMANTIC_WEIGHT: Final[float] = 0.15
-CONSISTENCY_WEIGHT: Final[float] = 0.10
+BEHAVIOR_WEIGHT: Final[float] = 0.15
+SEMANTIC_WEIGHT: Final[float] = 0.20
+EDUCATION_WEIGHT: Final[float] = 0.10
+CONSISTENCY_WEIGHT: Final[float] = 0.05
+CONSISTENCY_PENALTY: Final[float] = 0.1
+
+# Career scorer component weights
+CAREER_ROLE_RELEVANCE_WEIGHT: Final[float] = 0.30
+CAREER_RESPONSIBILITIES_WEIGHT: Final[float] = 0.25
+CAREER_PROGRESSION_WEIGHT: Final[float] = 0.15
+CAREER_INDUSTRY_MATCH_WEIGHT: Final[float] = 0.15
+CAREER_RELEVANT_EXPERIENCE_WEIGHT: Final[float] = 0.15
 
 # Validation thresholds
 MIN_CAREER_SCORE: Final[float] = 0.0

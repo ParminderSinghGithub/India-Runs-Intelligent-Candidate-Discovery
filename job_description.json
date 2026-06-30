@@ -1,0 +1,54 @@
+{
+  "job_id": "CHALLENGE_JOB_001",
+  "title": "Machine Learning Engineer",
+  "company": "Redrob AI",
+  "location": "India",
+  "description": "We are looking for a Machine Learning Engineer to join our team and build production ML systems.",
+  "required_experience_years": 3,
+  "required_skills": [
+    "Python",
+    "Machine Learning",
+    "Deep Learning",
+    "TensorFlow",
+    "PyTorch",
+    "SQL"
+  ],
+  "preferred_skills": [
+    "MLOps",
+    "Kubernetes",
+    "Docker",
+    "AWS",
+    "Spark"
+  ],
+  "responsibilities": [
+    "Build and deploy machine learning models to production",
+    "Design and implement data pipelines",
+    "Work with large-scale datasets",
+    "Collaborate with data scientists and engineers",
+    "Optimize model performance and latency"
+  ],
+  "target_industries": [
+    "Technology",
+    "AI/ML",
+    "SaaS"
+  ],
+  "technologies": [
+    "Python",
+    "TensorFlow",
+    "PyTorch",
+    "Kubernetes",
+    "Docker",
+    "AWS",
+    "Spark",
+    "SQL"
+  ],
+  "nice_to_have_skills": [
+    "Computer Vision",
+    "NLP",
+    "Recommendation Systems",
+    "Graph Neural Networks"
+  ],
+  "work_mode": "Remote",
+  "minimum_experience": 3,
+  "maximum_experience": 8
+}

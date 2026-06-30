@@ -1,28 +1,28 @@
 """Hybrid ranker interface."""
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from src.models.candidate import Candidate
-from src.models.job_description import JobDescription
+from src.models.score_result import ScoreResult
+from src.models.scoring_context import ScoringContext
 
 
-class HybridRanker:
-    """Abstract ranker for combining multiple scoring dimensions."""
+class HybridRanker(ABC):
+    """Abstract ranker for combining multiple scoring dimensions.
+
+    Orchestrates multiple scorers and merges their results into a final
+    ranking. Does not implement scoring logic itself - that's handled
+    by individual scorers.
+    """
 
     @abstractmethod
-    def rank(
-        self,
-        candidates: List[Candidate],
-        job_description: JobDescription,
-        **kwargs: Any,
-    ) -> List[Dict[str, Any]]:
+    def rank(self, context: ScoringContext) -> List[Dict[str, Any]]:
         """Rank candidates based on hybrid scoring.
 
         Args:
-            candidates: List of candidate objects to rank.
-            job_description: Job description to match against.
-            **kwargs: Additional ranking parameters.
+            context: ScoringContext containing candidates and job description.
+                    The context should contain a list of candidates in metadata
+                    or config.
 
         Returns:
             List[Dict[str, Any]]: Ranked list of candidates with scores.
@@ -34,20 +34,13 @@ class HybridRanker:
         pass
 
     @abstractmethod
-    def calculate_hybrid_score(
-        self,
-        candidate: Candidate,
-        job_description: JobDescription,
-        **kwargs: Any,
-    ) -> float:
+    def calculate_hybrid_score(self, context: ScoringContext) -> ScoreResult:
         """Calculate hybrid score for a single candidate.
 
         Args:
-            candidate: Candidate object.
-            job_description: Job description object.
-            **kwargs: Additional scoring parameters.
+            context: ScoringContext containing candidate and job description.
 
         Returns:
-            float: Hybrid score between 0.0 and 1.0.
+            ScoreResult: Hybrid score with merged details from all scorers.
         """
         pass

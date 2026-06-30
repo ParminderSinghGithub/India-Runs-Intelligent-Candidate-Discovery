@@ -12,6 +12,12 @@ from src.config import (
 )
 from src.utils import setup_logging
 from src.parser.candidate_parser import CandidateParser
+from src.parser.job_description_parser import JobDescriptionParser
+from src.models.score_result import ScoreResult
+from src.models.scoring_context import ScoringContext
+from src.scoring.hybrid_ranker import HybridRanker
+from src.scoring.career_scorer import CareerScorer
+from src.retrieval.document_builder import RetrievalDocumentBuilder
 
 
 def print_banner() -> None:
@@ -106,7 +112,190 @@ def main() -> int:
         print(f"✗ Parser test failed: {e}")
         return 1
 
-    print("\nPipeline ready. Parser module implemented.")
+    # Test scoring infrastructure
+    print("\nTesting scoring infrastructure...")
+    try:
+        # Create a mock job description for testing
+        from src.models.job_description import JobDescription
+        job_desc = JobDescription(
+            job_id="JOB_001",
+            title="Software Engineer",
+            company="Tech Corp",
+            required_skills=["Python", "SQL"],
+        )
+
+        # Create ScoringContext
+        context = ScoringContext(
+            candidate=candidate,
+            job_description=job_desc,
+            config={"test": True},
+        )
+        print("✓ ScoringContext instantiated")
+
+        # Create ScoreResult
+        score_result = ScoreResult(
+            score=0.85,
+            confidence=0.9,
+            reasons=["Good match", "Required skills present"],
+            matched_items=["Python", "SQL"],
+            missing_items=["Machine Learning"],
+            metadata={"scorer": "test"},
+        )
+        print(f"✓ ScoreResult instantiated (score: {score_result.score})")
+
+        # Verify ScoreResult helper methods
+        print(f"  - High confidence: {score_result.is_high_confidence()}")
+        print(f"  - Has match 'Python': {score_result.has_match('Python')}")
+        print(f"  - Has missing 'ML': {score_result.has_missing('Machine Learning')}")
+
+        # Note: HybridRanker is abstract, so we can't instantiate it directly
+        print("✓ HybridRanker interface imported (abstract class)")
+        print("\n✓ Scoring infrastructure working correctly")
+
+    except Exception as e:
+        print(f"✗ Scoring infrastructure test failed: {e}")
+        return 1
+
+    # Test CareerScorer
+    print("\nTesting CareerScorer...")
+    try:
+        from src.models.job_description import JobDescription
+        job_desc = JobDescription(
+            job_id="JOB_001",
+            title="Backend Engineer",
+            company="Tech Corp",
+            required_skills=["Python", "SQL"],
+            responsibilities=["Build backend systems", "Design data pipelines"],
+        )
+
+        # Create ScoringContext for career scoring
+        context = ScoringContext(
+            candidate=candidate,
+            job_description=job_desc,
+            config={
+                "career_role_relevance_weight": 0.30,
+                "career_responsibilities_weight": 0.25,
+                "career_progression_weight": 0.15,
+                "career_industry_match_weight": 0.15,
+                "career_relevant_experience_weight": 0.15,
+            },
+        )
+
+        # Instantiate and run CareerScorer
+        career_scorer = CareerScorer()
+        career_result = career_scorer.score(context)
+
+        print(f"\nCareer Score: {career_result.score:.2f}")
+        print(f"Confidence: {career_result.confidence:.2f}")
+        print(f"\nReasons ({len(career_result.reasons)}):")
+        for reason in career_result.reasons[:5]:  # Show first 5 reasons
+            print(f"  - {reason}")
+        if len(career_result.reasons) > 5:
+            print(f"  ... and {len(career_result.reasons) - 5} more")
+
+        print(f"\nMatched Evidence ({len(career_result.matched_items)}):")
+        for item in career_result.matched_items[:5]:
+            print(f"  - {item}")
+        if len(career_result.matched_items) > 5:
+            print(f"  ... and {len(career_result.matched_items) - 5} more")
+
+        print(f"\nPartial Scores:")
+        partial_scores = career_result.get_metadata("partial_scores", {})
+        for component, score in partial_scores.items():
+            print(f"  - {component}: {score:.2f}")
+
+        print(f"\nEvidence Count: {career_result.get_metadata('evidence_count', 0)}")
+        print("\n✓ CareerScorer working correctly")
+
+    except Exception as e:
+        print(f"✗ CareerScorer test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    # Test JobDescriptionParser
+    print("\nTesting JobDescriptionParser...")
+    try:
+        job_file = PROJECT_ROOT / "job_description.json"
+
+        if not job_file.exists():
+            print(f"⚠ Job description file not found: {job_file}")
+        else:
+            jd_parser = JobDescriptionParser()
+            parsed_job = jd_parser.parse_from_file(job_file)
+
+            jd = parsed_job.job_description
+            sq = parsed_job.search_query
+            cf = parsed_job.candidate_filters
+
+            print(f"\nRole: {jd.title}")
+            print(f"Company: {jd.company}")
+            print(f"Location: {jd.location}")
+            print(f"Experience Required: {jd.required_experience_years} years")
+            print(f"\nRequired Skills ({len(jd.required_skills)}):")
+            for skill in jd.required_skills:
+                print(f"  - {skill}")
+            print(f"\nResponsibilities ({len(jd.responsibilities)}):")
+            for resp in jd.responsibilities:
+                print(f"  - {resp}")
+
+            print(f"\nSearch Queries:")
+            print(f"  Identity: {sq.identity_query[:80]}...")
+            print(f"  Career: {sq.career_query[:80]}...")
+            print(f"  Skills: {sq.skills_query[:80]}...")
+            print(f"  Combined: {sq.combined_query[:80]}...")
+
+            print(f"\nCandidate Filters:")
+            print(f"  Min Experience: {cf.minimum_experience_years}")
+            print(f"  Max Experience: {cf.maximum_experience_years}")
+            print(f"  Location: {cf.required_location}")
+            print(f"  Industries: {cf.required_industries}")
+            print(f"  Work Mode: {cf.required_work_mode}")
+            print(f"  Has Filters: {cf.has_filters()}")
+
+            print("\n✓ JobDescriptionParser working correctly")
+
+    except Exception as e:
+        print(f"✗ JobDescriptionParser test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    # Test RetrievalDocumentBuilder
+    print("\nTesting RetrievalDocumentBuilder...")
+    try:
+        doc_builder = RetrievalDocumentBuilder()
+        retrieval_doc = doc_builder.build(candidate)
+
+        print(f"\nCandidate ID: {retrieval_doc.candidate_id}")
+        print(f"\nDocument Preview (first 500 chars):")
+        print(retrieval_doc.document[:500])
+        if len(retrieval_doc.document) > 500:
+            print("...")
+
+        print(f"\nMetadata:")
+        print(f"  Title: {retrieval_doc.get_metadata('title')}")
+        print(f"  Location: {retrieval_doc.get_metadata('location')}")
+        print(f"  Experience Years: {retrieval_doc.get_metadata('experience_years')}")
+        print(f"  Number of Skills: {retrieval_doc.get_metadata('number_of_skills')}")
+        print(f"  Number of Career Entries: {retrieval_doc.get_metadata('number_of_career_entries')}")
+        print(f"  Document Length: {retrieval_doc.get_metadata('document_length')} chars")
+        print(f"  Document Word Count: {retrieval_doc.get_metadata('document_word_count')} words")
+        print(f"  Section Count: {retrieval_doc.get_metadata('section_count')}")
+        print(f"  Sections: {retrieval_doc.get_metadata('sections')}")
+
+        print(f"\nFull Document:")
+        print(retrieval_doc.document)
+
+        print("\n✓ RetrievalDocumentBuilder working correctly")
+
+    except Exception as e:
+        print(f"✗ RetrievalDocumentBuilder test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, and RetrievalDocumentBuilder implemented.")
     return 0
 
 

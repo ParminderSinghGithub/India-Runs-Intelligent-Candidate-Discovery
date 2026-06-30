@@ -10,6 +10,12 @@ from .profile import Profile
 from .certification import Certification
 from .language import Language
 from .redrob_signals import RedrobSignals, SalaryRange
+from .score_result import ScoreResult
+from .scoring_context import ScoringContext
+from .search_query import SearchQuery
+from .candidate_filters import CandidateFilters
+from .parsed_job import ParsedJob
+from .retrieval_document import RetrievalDocument
 
 __all__ = [
     "Candidate",
@@ -23,4 +29,10 @@ __all__ = [
     "Language",
     "RedrobSignals",
     "SalaryRange",
+    "ScoreResult",
+    "ScoringContext",
+    "SearchQuery",
+    "CandidateFilters",
+    "ParsedJob",
+    "RetrievalDocument",
 ]

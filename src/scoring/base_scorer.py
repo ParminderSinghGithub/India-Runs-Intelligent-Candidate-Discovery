@@ -1,35 +1,49 @@
 """Base scorer interface."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+
+from src.models.score_result import ScoreResult
+from src.models.scoring_context import ScoringContext
 
 
 class BaseScorer(ABC):
-    """Abstract base class for all scorers."""
+    """Abstract base class for all scorers.
+
+    All scorers must implement the score method that accepts ScoringContext
+    and returns ScoreResult. This ensures consistent interface across all
+    scoring dimensions.
+    """
 
     @abstractmethod
-    def score(self, **kwargs: Any) -> float:
-        """Calculate a score based on provided inputs.
+    def score(self, context: ScoringContext) -> ScoreResult:
+        """Calculate a score based on the provided context.
 
         Args:
-            **kwargs: Arbitrary keyword arguments specific to the scorer.
+            context: ScoringContext containing candidate, job description,
+                    and configuration.
 
         Returns:
-            float: Calculated score between 0.0 and 1.0.
+            ScoreResult: Standardized scoring result with score, confidence,
+                         reasons, matched/missing items, and metadata.
 
         Raises:
             ScorerError: If scoring fails.
         """
         pass
 
-    @abstractmethod
-    def validate_inputs(self, **kwargs: Any) -> bool:
+    def validate_inputs(self, context: ScoringContext) -> bool:
         """Validate inputs before scoring.
 
+        Default implementation checks that candidate and job_description
+        are present in context. Subclasses can override for specific validation.
+
         Args:
-            **kwargs: Arbitrary keyword arguments to validate.
+            context: ScoringContext to validate.
 
         Returns:
             bool: True if inputs are valid, False otherwise.
         """
-        pass
+        return (
+            context.candidate is not None
+            and context.job_description is not None
+        )
