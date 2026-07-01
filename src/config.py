@@ -15,6 +15,9 @@ OUTPUTS_DIR: Final[Path] = PROJECT_ROOT / "outputs"
 CANDIDATES_DATA_PATH: Final[Path] = PROJECT_ROOT / "data" / "candidates"
 JOB_DESCRIPTIONS_PATH: Final[Path] = PROJECT_ROOT / "data" / "job_descriptions"
 
+# Embedding paths
+EMBEDDINGS_DIR: Final[Path] = ARTIFACTS_DIR / "embeddings"
+
 # Random seed for reproducibility
 RANDOM_SEED: Final[int] = 42
 
@@ -54,3 +57,10 @@ MAX_CONSISTENCY_SCORE: Final[float] = 1.0
 # Output configuration
 OUTPUT_FILE_FORMAT: Final[str] = "json"
 OUTPUT_ENCODING: Final[str] = "utf-8"
+
+# Embedding configuration
+EMBEDDING_MODEL_NAME: Final[str] = "BAAI/bge-base-en-v1.5"
+EMBEDDING_BATCH_SIZE: Final[int] = 32
+EMBEDDING_DEVICE: Final[str] = "auto"  # "auto", "cuda", "cpu"
+EMBEDDING_NORMALIZE: Final[bool] = True
+EMBEDDING_CACHE_ENABLED: Final[bool] = True

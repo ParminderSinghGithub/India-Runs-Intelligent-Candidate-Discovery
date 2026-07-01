@@ -18,6 +18,7 @@ from src.models.scoring_context import ScoringContext
 from src.scoring.hybrid_ranker import HybridRanker
 from src.scoring.career_scorer import CareerScorer
 from src.retrieval.document_builder import RetrievalDocumentBuilder
+from src.embeddings.embedder import EmbeddingEngine
 
 
 def print_banner() -> None:
@@ -295,7 +296,75 @@ def main() -> int:
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, and RetrievalDocumentBuilder implemented.")
+    # Test EmbeddingEngine
+    print("\nTesting EmbeddingEngine...")
+    try:
+        import time
+
+        # Parse 20 sample candidates
+        candidates_file = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
+
+        if not candidates_file.exists():
+            print(f"⚠ Candidates file not found: {candidates_file}")
+        else:
+            import json
+
+            # Load candidates from JSON array
+            with open(candidates_file, "r", encoding="utf-8") as f:
+                candidates_data = json.load(f)
+
+            parser = CandidateParser()
+            candidates = [parser.from_dict(cand_data) for cand_data in candidates_data]
+
+            # Limit to 20 candidates for testing
+            candidates = candidates[:20]
+            print(f"Parsed {len(candidates)} candidates for embedding test")
+
+            # Generate RetrievalDocument objects
+            doc_builder = RetrievalDocumentBuilder()
+            retrieval_docs = [doc_builder.build(cand) for cand in candidates]
+
+            print(f"Generated {len(retrieval_docs)} retrieval documents")
+
+            # Initialize embedding engine
+            embedder = EmbeddingEngine()
+
+            # Load model
+            embedder.load_model()
+            print(f"Embedding model: {embedder.model_name}")
+            print(f"Embedding dimension: {embedder.get_embedding_dimension()}")
+
+            # Embed documents
+            start_time = time.time()
+            embeddings = embedder.embed_documents(retrieval_docs, show_progress=True)
+            embedding_time = time.time() - start_time
+
+            print(f"\nNumber of documents: {len(retrieval_docs)}")
+            print(f"Embedding matrix shape: {embeddings.shape}")
+            print(f"Embedding time: {embedding_time:.2f}s")
+            print(f"Average time per document: {embedding_time / len(retrieval_docs):.3f}s")
+
+            # Save embeddings
+            candidate_ids = [doc.candidate_id for doc in retrieval_docs]
+            metadata = [doc.metadata for doc in retrieval_docs]
+            cache_path = embedder.save_embeddings(embeddings, candidate_ids, metadata, cache_name="test_embeddings")
+
+            print(f"Cache location: {cache_path}")
+
+            # Test loading embeddings
+            loaded_embeddings, loaded_ids, loaded_metadata = embedder.load_embeddings(cache_name="test_embeddings")
+            print(f"Loaded embeddings shape: {loaded_embeddings.shape}")
+            print(f"Loaded candidate IDs: {len(loaded_ids)}")
+
+            print("\n✓ EmbeddingEngine working correctly")
+
+    except Exception as e:
+        print(f"✗ EmbeddingEngine test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, and EmbeddingEngine implemented.")
     return 0
 
 
