@@ -16,6 +16,7 @@ from .search_query import SearchQuery
 from .candidate_filters import CandidateFilters
 from .parsed_job import ParsedJob
 from .retrieval_document import RetrievalDocument
+from .offline_index_result import OfflineIndexResult
 
 __all__ = [
     "Candidate",
@@ -35,4 +36,5 @@ __all__ = [
     "CandidateFilters",
     "ParsedJob",
     "RetrievalDocument",
+    "OfflineIndexResult",
 ]

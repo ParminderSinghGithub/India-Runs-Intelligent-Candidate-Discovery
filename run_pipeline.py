@@ -20,6 +20,7 @@ from src.scoring.career_scorer import CareerScorer
 from src.retrieval.document_builder import RetrievalDocumentBuilder
 from src.retrieval.retriever import Retriever
 from src.embeddings.embedder import EmbeddingEngine
+from src.pipeline.offline_pipeline import OfflineIndexBuilder
 
 
 def print_banner() -> None:
@@ -438,7 +439,37 @@ def main() -> int:
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, EmbeddingEngine, and Retriever implemented.")
+    # Test OfflineIndexBuilder
+    print("\nTesting OfflineIndexBuilder...")
+    try:
+        # Use the candidates JSONL file
+        candidates_jsonl = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "candidates.jsonl"
+
+        if not candidates_jsonl.exists():
+            print(f"⚠ Candidates JSONL file not found: {candidates_jsonl}")
+        else:
+            # Initialize offline index builder
+            builder = OfflineIndexBuilder()
+
+            # Build index with max_candidates=20 for testing
+            result = builder.build_candidate_index(
+                candidates_jsonl_path=candidates_jsonl,
+                max_candidates=20,
+                force_rebuild=True,
+            )
+
+            # Print result summary
+            print("\n" + str(result))
+
+            print("\n✓ OfflineIndexBuilder working correctly")
+
+    except Exception as e:
+        print(f"✗ OfflineIndexBuilder test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, EmbeddingEngine, Retriever, and OfflineIndexBuilder implemented.")
     return 0
 
 
