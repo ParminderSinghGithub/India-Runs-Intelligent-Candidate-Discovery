@@ -18,6 +18,7 @@ from src.models.scoring_context import ScoringContext
 from src.scoring.hybrid_ranker import HybridRanker
 from src.scoring.career_scorer import CareerScorer
 from src.retrieval.document_builder import RetrievalDocumentBuilder
+from src.retrieval.retriever import Retriever
 from src.embeddings.embedder import EmbeddingEngine
 
 
@@ -364,7 +365,80 @@ def main() -> int:
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, and EmbeddingEngine implemented.")
+    # Test Retriever
+    print("\nTesting Retriever...")
+    try:
+        # Use the same 20 candidates from embedding test
+        candidates_file = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
+
+        if not candidates_file.exists():
+            print(f"⚠ Candidates file not found: {candidates_file}")
+        else:
+            import json
+
+            # Load candidates from JSON array
+            with open(candidates_file, "r", encoding="utf-8") as f:
+                candidates_data = json.load(f)
+
+            parser = CandidateParser()
+            candidates = [parser.from_dict(cand_data) for cand_data in candidates_data]
+
+            # Limit to 20 candidates for testing
+            candidates = candidates[:20]
+            print(f"Parsed {len(candidates)} candidates for retrieval test")
+
+            # Generate RetrievalDocument objects
+            doc_builder = RetrievalDocumentBuilder()
+            retrieval_docs = [doc_builder.build(cand) for cand in candidates]
+
+            print(f"Generated {len(retrieval_docs)} retrieval documents")
+
+            # Initialize retriever with force_rebuild to test building
+            retriever = Retriever(force_rebuild=True)
+
+            # Build index
+            retriever.build_index(retrieval_docs, show_progress=True)
+            print(f"Index built with {retriever.get_index_size()} candidates")
+
+            # Test search
+            query = "machine learning engineer python tensorflow"
+            print(f"\nSearching for: {query}")
+            results = retriever.search(query, k=5)
+
+            print(f"\nTop 5 Results:")
+            for result in results:
+                rank = result["rank"]
+                candidate_id = result["candidate_id"]
+                similarity = result["similarity"]
+                metadata = result["metadata"]
+                title = metadata.get("title", "N/A")
+                experience = metadata.get("experience_years", "N/A")
+
+                print(f"\n  Rank {rank}:")
+                print(f"    Candidate ID: {candidate_id}")
+                print(f"    Similarity: {similarity:.4f}")
+                print(f"    Current Title: {title}")
+                print(f"    Years Experience: {experience}")
+
+            # Test loading existing index
+            print("\nTesting index loading...")
+            retriever2 = Retriever(force_rebuild=False)
+            retriever2.load_index()
+            print(f"Loaded index with {retriever2.get_index_size()} candidates")
+
+            # Test search on loaded index
+            results2 = retriever2.search(query, k=5)
+            print(f"Search on loaded index returned {len(results2)} results")
+
+            print("\n✓ Retriever working correctly")
+
+    except Exception as e:
+        print(f"✗ Retriever test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, EmbeddingEngine, and Retriever implemented.")
     return 0
 
 

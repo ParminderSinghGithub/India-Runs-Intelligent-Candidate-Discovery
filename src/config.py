@@ -64,3 +64,8 @@ EMBEDDING_BATCH_SIZE: Final[int] = 32
 EMBEDDING_DEVICE: Final[str] = "auto"  # "auto", "cuda", "cpu"
 EMBEDDING_NORMALIZE: Final[bool] = True
 EMBEDDING_CACHE_ENABLED: Final[bool] = True
+
+# FAISS configuration
+FAISS_DIR: Final[Path] = ARTIFACTS_DIR / "faiss"
+FAISS_INDEX_TYPE: Final[str] = "IndexFlatIP"  # Inner product for normalized embeddings
+FAISS_NPROBE: Final[int] = 10  # For IVF indices (not used with IndexFlatIP)
