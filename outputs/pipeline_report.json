@@ -1,0 +1,1484 @@
+{
+  "timestamp": "2026-07-02T11:41:39.936097+00:00",
+  "runtime_seconds": 38.666950300044846,
+  "retrieval_latency_seconds": 3.307111400004942,
+  "reranking_latency_seconds": 35.359838900039904,
+  "csv_generation_seconds": 0.0,
+  "validation_seconds": 0.0,
+  "candidate_counts": {
+    "retrieved": 100,
+    "ranked": 100,
+    "submitted": 100
+  },
+  "retrieval_statistics": {
+    "average_similarity": 0.7475030362606049,
+    "max_similarity": 0.7844254374504089,
+    "min_similarity": 0.731184720993042
+  },
+  "weights": {
+    "semantic": 0.2,
+    "career": 0.25,
+    "skill": 0.25,
+    "behavior": 0.15,
+    "education": 0.1,
+    "consistency": 0.05
+  },
+  "configuration": {
+    "top_k": 100
+  },
+  "top10": [
+    {
+      "candidate_id": "CAND_0088025",
+      "rank": 1,
+      "score": 0.6482994353499167,
+      "reasoning": "Strong Staff Machine Learning Engineer fit with 8.6 years in AI/ML and tightly aligned career, skill, and semantic signals. Important matches include Staff Machine Learning Engineer, Senior Machine Learning Engineer, and recommendation. Remaining skill gaps are machine learning, pytorch, and sql. Open to work, which makes outreach easier. Notice period is moderate at 90 days. Profile is verified by email and phone. Recruiter response rate is 0.83. GitHub activity score is 74.60. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7472676038742065,
+      "career_score": 0.83,
+      "skill_score": 0.7513888888888889,
+      "behavior_score": 0.6899912823523542,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6482994353499167,
+      "confidence": 0.838763961877656,
+      "matched_evidence": [
+        "Staff Machine Learning Engineer",
+        "Senior Machine Learning Engineer",
+        "recommendation",
+        "retrieval",
+        "ranking",
+        "machine learning",
+        "evaluation",
+        "AI/ML",
+        "HealthTech AI",
+        "AI Services",
+        "python",
+        "deep learning",
+        "tensorflow",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "High offer acceptance rate",
+        "Open to work",
+        "Moderate notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "machine learning",
+        "pytorch",
+        "sql",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7472676038742065,
+        "career": 0.83,
+        "skill": 0.7513888888888889,
+        "behavior": 0.6899912823523542,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7472676038742065,
+        "career": 1.0,
+        "skill": 0.7261111111111112,
+        "behavior": 0.8797871269559234,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 39,
+        "retrieval_similarity": 0.7472676038742065,
+        "component_scores": {
+          "semantic": 0.7472676038742065,
+          "career": 0.83,
+          "skill": 0.7513888888888889,
+          "behavior": 0.6899912823523542,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7472676038742065,
+          "career": 1.0,
+          "skill": 0.7261111111111112,
+          "behavior": 0.8797871269559234,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7472676038742065,
+          "career": 0.83,
+          "skill": 0.7513888888888889,
+          "behavior": 0.6899912823523542,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.5,
+              "progression": 0.6999999999999998,
+              "industry_match": 1.0,
+              "relevant_experience": 1.0
+            },
+            "evidence_count": 10
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.5,
+              "preferred_match": 1.0,
+              "proficiency": 0.9166666666666666,
+              "duration": 0.9305555555555555,
+              "endorsement": 0.7000000000000001,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 11
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.7091005870118264,
+              "candidate_activity": 0.372366119805785,
+              "hiring_reliability": 0.8915,
+              "availability": 0.8700310506313416,
+              "professional_network": 0.770475813556566,
+              "risk_penalties": 0.07338875450300186,
+              "score_before_penalty": 0.763380036855356
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0074225",
+      "rank": 2,
+      "score": 0.6323062416884867,
+      "reasoning": "Strong Machine Learning Engineer fit with 4.3 years in EdTech and tightly aligned career, skill, and semantic signals. Important matches include Machine Learning Engineer, ranking, and feature engineering. Remaining skill gaps are deep learning, tensorflow, and pytorch. Open to work, which makes outreach easier. Notice period is long at 120 days. Profile is verified by email and phone. Recruiter response rate is 0.91. GitHub activity score is 54.30. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7436032295227051,
+      "career_score": 0.78,
+      "skill_score": 0.7466666666666667,
+      "behavior_score": 0.6794595274485274,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6323062416884867,
+      "confidence": 0.7758058019490318,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "ranking",
+        "feature engineering",
+        "evaluation",
+        "EdTech",
+        "AI/ML",
+        "python",
+        "machine learning",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "Open to work",
+        "Flexible work mode",
+        "Willing to relocate",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "deep learning",
+        "tensorflow",
+        "pytorch",
+        "sql",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Offer acceptance unavailable",
+        "Long notice period",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7436032295227051,
+        "career": 0.78,
+        "skill": 0.7466666666666667,
+        "behavior": 0.6794595274485274,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7436032295227051,
+        "career": 0.8,
+        "skill": 0.7333333333333334,
+        "behavior": 0.8492063494586846,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 56,
+        "retrieval_similarity": 0.7436032295227051,
+        "component_scores": {
+          "semantic": 0.7436032295227051,
+          "career": 0.78,
+          "skill": 0.7466666666666667,
+          "behavior": 0.6794595274485274,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7436032295227051,
+          "career": 0.8,
+          "skill": 0.7333333333333334,
+          "behavior": 0.8492063494586846,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7436032295227051,
+          "career": 0.78,
+          "skill": 0.7466666666666667,
+          "behavior": 0.6794595274485274,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.3,
+              "progression": 0.7,
+              "industry_match": 1.0,
+              "relevant_experience": 1.0
+            },
+            "evidence_count": 6
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.3333333333333333,
+              "preferred_match": 1.0,
+              "proficiency": 1.0,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 10
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.7109504912911313,
+              "candidate_activity": 0.37369444079875397,
+              "hiring_reliability": 0.8,
+              "availability": 0.9229378987373167,
+              "professional_network": 0.7638457443863975,
+              "risk_penalties": 0.07679410679620903,
+              "score_before_penalty": 0.7562536342447365
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0080766",
+      "rank": 3,
+      "score": 0.6318509474732023,
+      "reasoning": "Strong Staff Machine Learning Engineer fit with 8.8 years in Software and tightly aligned career, skill, and semantic signals. Important matches include Staff Machine Learning Engineer, Senior Machine Learning Engineer, and feature engineering. Remaining skill gaps are machine learning, pytorch, and sql. The candidate is not explicitly open to work. Notice period is short at 0 days. Profile is verified by email and phone. Recruiter response rate is 0.66. GitHub activity score is 32.90. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7552962303161621,
+      "career_score": 0.73875,
+      "skill_score": 0.7983333333333333,
+      "behavior_score": 0.6434724538442431,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6318509474732023,
+      "confidence": 0.8567825079649258,
+      "matched_evidence": [
+        "Staff Machine Learning Engineer",
+        "Senior Machine Learning Engineer",
+        "feature engineering",
+        "ranking",
+        "evaluation",
+        "production",
+        "retrieval",
+        "Software",
+        "AI/ML",
+        "Conversational AI",
+        "python",
+        "deep learning",
+        "tensorflow",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "High offer acceptance rate",
+        "Short notice period",
+        "Flexible work mode",
+        "Willing to relocate",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "machine learning",
+        "pytorch",
+        "sql",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Not open to work",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7552962303161621,
+        "career": 0.73875,
+        "skill": 0.7983333333333333,
+        "behavior": 0.6434724538442431,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7552962303161621,
+        "career": 1.0,
+        "skill": 0.7866666666666666,
+        "behavior": 0.8702614602685856,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 25,
+        "retrieval_similarity": 0.7552962303161621,
+        "component_scores": {
+          "semantic": 0.7552962303161621,
+          "career": 0.73875,
+          "skill": 0.7983333333333333,
+          "behavior": 0.6434724538442431,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7552962303161621,
+          "career": 1.0,
+          "skill": 0.7866666666666666,
+          "behavior": 0.8702614602685856,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7552962303161621,
+          "career": 0.73875,
+          "skill": 0.7983333333333333,
+          "behavior": 0.6434724538442431,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.5,
+              "progression": 0.7,
+              "industry_match": 0.75,
+              "relevant_experience": 0.6416666666666666
+            },
+            "evidence_count": 10
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.5,
+              "preferred_match": 1.0,
+              "proficiency": 1.0,
+              "duration": 1.0,
+              "endorsement": 0.9333333333333332,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 12
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.7619651951664825,
+              "candidate_activity": 0.2700181138110488,
+              "hiring_reliability": 0.7675000000000001,
+              "availability": 0.7925,
+              "professional_network": 0.8786052617179189,
+              "risk_penalties": 0.09575033102940031,
+              "score_before_penalty": 0.7392227848736435
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0030348",
+      "rank": 4,
+      "score": 0.6272729522311636,
+      "reasoning": "Strong Machine Learning Engineer fit with 4.5 years in EdTech and tightly aligned career, skill, and semantic signals. Important matches include Machine Learning Engineer, retrieval, and feature engineering. Remaining skill gaps are machine learning, tensorflow, and sql. Open to work, which makes outreach easier. Notice period is moderate at 45 days. Profile is verified by email and phone. Recruiter response rate is 0.54. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7413339614868164,
+      "career_score": 0.7267452830188679,
+      "skill_score": 0.7941666666666667,
+      "behavior_score": 0.6585211500827783,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6272729522311636,
+      "confidence": 0.8262519308556222,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "retrieval",
+        "feature engineering",
+        "recommendation",
+        "ranking",
+        "Senior Data Scientist",
+        "EdTech",
+        "Insurance Tech",
+        "python",
+        "deep learning",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "Open to work",
+        "Moderate notice period",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "machine learning",
+        "tensorflow",
+        "sql",
+        "Inactive profile",
+        "Weak GitHub activity",
+        "Offer acceptance unavailable",
+        "Restrictive work mode",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7413339614868164,
+        "career": 0.7267452830188679,
+        "skill": 0.7941666666666667,
+        "behavior": 0.6585211500827783,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7413339614868164,
+        "career": 0.9,
+        "skill": 0.7916666666666667,
+        "behavior": 0.8742045484216603,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 62,
+        "retrieval_similarity": 0.7413339614868164,
+        "component_scores": {
+          "semantic": 0.7413339614868164,
+          "career": 0.7267452830188679,
+          "skill": 0.7941666666666667,
+          "behavior": 0.6585211500827783,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7413339614868164,
+          "career": 0.9,
+          "skill": 0.7916666666666667,
+          "behavior": 0.8742045484216603,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7413339614868164,
+          "career": 0.7267452830188679,
+          "skill": 0.7941666666666667,
+          "behavior": 0.6585211500827783,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 0.8999999999999999,
+              "responsibilities": 0.39999999999999997,
+              "progression": 0.85,
+              "industry_match": 1.0,
+              "relevant_experience": 0.5283018867924528
+            },
+            "evidence_count": 8
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.5,
+              "preferred_match": 1.0,
+              "proficiency": 0.9166666666666666,
+              "duration": 0.9583333333333334,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.8
+            },
+            "evidence_count": 12
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.7022316292771937,
+              "candidate_activity": 0.20995768989668304,
+              "hiring_reliability": 0.93,
+              "availability": 0.839937068052205,
+              "professional_network": 0.847608505765489,
+              "risk_penalties": 0.08760476344117364,
+              "score_before_penalty": 0.746125913523952
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0072660",
+      "rank": 5,
+      "score": 0.6155796799598441,
+      "reasoning": "Strong Machine Learning Engineer fit with 7.1 years in EdTech and tightly aligned career, skill, and semantic signals. Important matches include Machine Learning Engineer, production, and machine learning. Remaining skill gaps are machine learning, deep learning, and tensorflow. Open to work, which makes outreach easier. Notice period is short at 30 days. Only email verification is present. Recruiter response rate is 0.53. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.773339569568634,
+      "career_score": 0.7268749999999999,
+      "skill_score": 0.7466666666666667,
+      "behavior_score": 0.6168423291963372,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6155796799598441,
+      "confidence": 0.8142139026369793,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "production",
+        "machine learning",
+        "feature engineering",
+        "ranking",
+        "EdTech",
+        "Software",
+        "AI/ML",
+        "python",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "Open to work",
+        "Short notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "machine learning",
+        "deep learning",
+        "tensorflow",
+        "sql",
+        "Missing phone verification",
+        "Inactive profile",
+        "Weak GitHub activity",
+        "Offer acceptance unavailable",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Unverified profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.773339569568634,
+        "career": 0.7268749999999999,
+        "skill": 0.7466666666666667,
+        "behavior": 0.6168423291963372,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.773339569568634,
+        "career": 0.9,
+        "skill": 0.7333333333333334,
+        "behavior": 0.8605371332958158,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 7,
+        "retrieval_similarity": 0.773339569568634,
+        "component_scores": {
+          "semantic": 0.773339569568634,
+          "career": 0.7268749999999999,
+          "skill": 0.7466666666666667,
+          "behavior": 0.6168423291963372,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.773339569568634,
+          "career": 0.9,
+          "skill": 0.7333333333333334,
+          "behavior": 0.8605371332958158,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.773339569568634,
+          "career": 0.7268749999999999,
+          "skill": 0.7466666666666667,
+          "behavior": 0.6168423291963372,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.39999999999999997,
+              "progression": 0.6999999999999998,
+              "industry_match": 1.0,
+              "relevant_experience": 0.47916666666666663
+            },
+            "evidence_count": 8
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.3333333333333333,
+              "preferred_match": 1.0,
+              "proficiency": 1.0,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 10
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 0.8,
+              "recruiter_interest": 0.6543427712583194,
+              "candidate_activity": 0.2945029288435995,
+              "hiring_reliability": 0.88,
+              "availability": 0.9067213515947206,
+              "professional_network": 0.7891566144072651,
+              "risk_penalties": 0.093131591722306,
+              "score_before_penalty": 0.7099739209186432
+            },
+            "evidence_count": 23
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0040887",
+      "rank": 6,
+      "score": 0.6145753863022397,
+      "reasoning": "Excellent technical match with Machine Learning Engineer experience, supported by solid recruiter-ready behavioral signals. Important matches include Machine Learning Engineer, retrieval, and feature engineering. Remaining skill gaps are machine learning, tensorflow, and pytorch. Open to work, which makes outreach easier. Notice period is short at 15 days. Profile is verified by email and phone. Recruiter response rate is 0.84. GitHub activity score is 34.20. Behavioral signals support a low-friction recruiting conversation. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7821449041366577,
+      "career_score": 0.6835227272727272,
+      "skill_score": 0.7216666666666667,
+      "behavior_score": 0.7123270466003974,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6145753863022397,
+      "confidence": 0.7771118088727584,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "retrieval",
+        "feature engineering",
+        "evaluation",
+        "EdTech",
+        "python",
+        "deep learning",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "High offer acceptance rate",
+        "Open to work",
+        "Short notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "machine learning",
+        "tensorflow",
+        "pytorch",
+        "sql",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7821449041366577,
+        "career": 0.6835227272727272,
+        "skill": 0.7216666666666667,
+        "behavior": 0.7123270466003974,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7821449041366577,
+        "career": 0.75,
+        "skill": 0.7333333333333334,
+        "behavior": 0.8885514892078654,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 4,
+        "retrieval_similarity": 0.7821449041366577,
+        "component_scores": {
+          "semantic": 0.7821449041366577,
+          "career": 0.6835227272727272,
+          "skill": 0.7216666666666667,
+          "behavior": 0.7123270466003974,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7821449041366577,
+          "career": 0.75,
+          "skill": 0.7333333333333334,
+          "behavior": 0.8885514892078654,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7821449041366577,
+          "career": 0.6835227272727272,
+          "skill": 0.7216666666666667,
+          "behavior": 0.7123270466003974,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.3,
+              "progression": 0.7,
+              "industry_match": 0.5,
+              "relevant_experience": 0.8568181818181819
+            },
+            "evidence_count": 5
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.3333333333333333,
+              "preferred_match": 1.0,
+              "proficiency": 0.875,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 10
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.7178626474499658,
+              "candidate_activity": 0.3822593266836018,
+              "hiring_reliability": 0.8360000000000001,
+              "availability": 0.9139013554815164,
+              "professional_network": 0.8949156751695646,
+              "risk_penalties": 0.07077746334130681,
+              "score_before_penalty": 0.7831045099417042
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0075574",
+      "rank": 7,
+      "score": 0.6069133185340078,
+      "reasoning": "Strong career history in Conversational AI through Machine Learning Engineer, giving this profile credible role alignment. Important matches include Machine Learning Engineer, ranking, and feature engineering. Remaining skill gaps are python, machine learning, and deep learning. Open to work, which makes outreach easier. Notice period is moderate at 60 days. Only email verification is present. Recruiter response rate is 0.58. GitHub activity score is 37.70. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7464985847473145,
+      "career_score": 0.7645588235294117,
+      "skill_score": 0.6883333333333334,
+      "behavior_score": 0.6292704157923907,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6069133185340078,
+      "confidence": 0.7695378613103496,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "ranking",
+        "feature engineering",
+        "evaluation",
+        "Conversational AI",
+        "AI/ML",
+        "AI Services",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "Recent applications",
+        "High interview completion rate",
+        "Open to work",
+        "Moderate notice period",
+        "Flexible work mode",
+        "Willing to relocate",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "python",
+        "machine learning",
+        "deep learning",
+        "tensorflow",
+        "sql",
+        "Missing phone verification",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Offer acceptance unavailable",
+        "Inactive profile risk",
+        "Unverified profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7464985847473145,
+        "career": 0.7645588235294117,
+        "skill": 0.6883333333333334,
+        "behavior": 0.6292704157923907,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7464985847473145,
+        "career": 0.8500000000000001,
+        "skill": 0.6666666666666667,
+        "behavior": 0.8376053233177834,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 42,
+        "retrieval_similarity": 0.7464985847473145,
+        "component_scores": {
+          "semantic": 0.7464985847473145,
+          "career": 0.7645588235294117,
+          "skill": 0.6883333333333334,
+          "behavior": 0.6292704157923907,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7464985847473145,
+          "career": 0.8500000000000001,
+          "skill": 0.6666666666666667,
+          "behavior": 0.8376053233177834,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7464985847473145,
+          "career": 0.7645588235294117,
+          "skill": 0.6883333333333334,
+          "behavior": 0.6292704157923907,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.3,
+              "progression": 0.6999999999999998,
+              "industry_match": 1.0,
+              "relevant_experience": 0.8970588235294117
+            },
+            "evidence_count": 7
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.16666666666666666,
+              "preferred_match": 1.0,
+              "proficiency": 1.0,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.6
+            },
+            "evidence_count": 7
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 0.8,
+              "recruiter_interest": 0.6291415669849232,
+              "candidate_activity": 0.32561004497216745,
+              "hiring_reliability": 0.96,
+              "availability": 0.9553732112860491,
+              "professional_network": 0.7272883598569441,
+              "risk_penalties": 0.09258411003133452,
+              "score_before_penalty": 0.7218545258237252
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0061655",
+      "rank": 8,
+      "score": 0.6059027417804891,
+      "reasoning": "Excellent technical match with Machine Learning Engineer experience, supported by solid recruiter-ready behavioral signals. Important matches include Machine Learning Engineer, ranking, and feature engineering. Remaining skill gaps are python, tensorflow, and sql. The candidate is not explicitly open to work. Notice period is short at 15 days. Profile is verified by email and phone. Recruiter response rate is 0.88. GitHub activity score is 56.50. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7628605365753174,
+      "career_score": 0.6775,
+      "skill_score": 0.7616666666666667,
+      "behavior_score": 0.6235931186583927,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6059027417804891,
+      "confidence": 0.786599166067474,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "ranking",
+        "feature engineering",
+        "recommendation",
+        "AI/ML",
+        "machine learning",
+        "deep learning",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "Short notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "python",
+        "tensorflow",
+        "sql",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Low offer acceptance rate",
+        "Not open to work",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7628605365753174,
+        "career": 0.6775,
+        "skill": 0.7616666666666667,
+        "behavior": 0.6235931186583927,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7628605365753174,
+        "career": 0.75,
+        "skill": 0.8,
+        "behavior": 0.8569145589485962,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 15,
+        "retrieval_similarity": 0.7628605365753174,
+        "component_scores": {
+          "semantic": 0.7628605365753174,
+          "career": 0.6775,
+          "skill": 0.7616666666666667,
+          "behavior": 0.6235931186583927,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7628605365753174,
+          "career": 0.75,
+          "skill": 0.8,
+          "behavior": 0.8569145589485962,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7628605365753174,
+          "career": 0.6775,
+          "skill": 0.7616666666666667,
+          "behavior": 0.6235931186583927,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.3,
+              "progression": 0.7,
+              "industry_match": 0.5,
+              "relevant_experience": 0.8166666666666668
+            },
+            "evidence_count": 5
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.5,
+              "preferred_match": 1.0,
+              "proficiency": 0.8333333333333334,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.4
+            },
+            "evidence_count": 13
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.6972320998718953,
+              "candidate_activity": 0.3346618787843606,
+              "hiring_reliability": 0.6970000000000001,
+              "availability": 0.7064013554815164,
+              "professional_network": 0.8350897167578369,
+              "risk_penalties": 0.08489145833563633,
+              "score_before_penalty": 0.708484576994029
+            },
+            "evidence_count": 22
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0032515",
+      "rank": 9,
+      "score": 0.6034466210437575,
+      "reasoning": "High semantic alignment with the job description and a credible Machine Learning Engineer background across 5.1 years. Important matches include Machine Learning Engineer, ranking, and feature engineering. Remaining skill gaps are python, tensorflow, and sql. The candidate is not explicitly open to work. Notice period is moderate at 45 days. Profile is verified by email and phone. Recruiter response rate is 0.54. GitHub activity score is 67.40. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7607564926147461,
+      "career_score": 0.695,
+      "skill_score": 0.7816666666666667,
+      "behavior_score": 0.5475243723609434,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.6034466210437575,
+      "confidence": 0.8416037716759184,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "ranking",
+        "feature engineering",
+        "production",
+        "machine learning",
+        "evaluation",
+        "HealthTech",
+        "Fintech",
+        "SaaS",
+        "deep learning",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High recruiter engagement",
+        "Recent applications",
+        "High interview completion rate",
+        "High offer acceptance rate",
+        "Moderate notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "python",
+        "tensorflow",
+        "sql",
+        "LinkedIn not connected",
+        "Inactive profile",
+        "GitHub activity unavailable",
+        "Not open to work",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Unverified profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7607564926147461,
+        "career": 0.695,
+        "skill": 0.7816666666666667,
+        "behavior": 0.5475243723609434,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7607564926147461,
+        "career": 0.95,
+        "skill": 0.8,
+        "behavior": 0.8380793826772099,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 18,
+        "retrieval_similarity": 0.7607564926147461,
+        "component_scores": {
+          "semantic": 0.7607564926147461,
+          "career": 0.695,
+          "skill": 0.7816666666666667,
+          "behavior": 0.5475243723609434,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7607564926147461,
+          "career": 0.95,
+          "skill": 0.8,
+          "behavior": 0.8380793826772099,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7607564926147461,
+          "career": 0.695,
+          "skill": 0.7816666666666667,
+          "behavior": 0.5475243723609434,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 0.8999999999999999,
+              "responsibilities": 0.5,
+              "progression": 0.6999999999999998,
+              "industry_match": 1.0,
+              "relevant_experience": 0.3
+            },
+            "evidence_count": 9
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.5,
+              "preferred_match": 1.0,
+              "proficiency": 0.8333333333333334,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.8
+            },
+            "evidence_count": 13
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 0.8,
+              "recruiter_interest": 0.6972529251077078,
+              "candidate_activity": 0.3284722632163298,
+              "hiring_reliability": 0.7010000000000001,
+              "availability": 0.6824370680522049,
+              "professional_network": 0.7786951504485725,
+              "risk_penalties": 0.11243599431249993,
+              "score_before_penalty": 0.6599603666734434
+            },
+            "evidence_count": 23
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    },
+    {
+      "candidate_id": "CAND_0089546",
+      "rank": 10,
+      "score": 0.5956862925554303,
+      "reasoning": "Strong Machine Learning Engineer fit with 4.8 years in HealthTech AI and tightly aligned career, skill, and semantic signals. Important matches include Machine Learning Engineer, production, and machine learning. Remaining skill gaps are python, machine learning, and deep learning. The candidate is not explicitly open to work. Notice period is moderate at 90 days. Profile is verified by email and phone. Recruiter response rate is 0.64. GitHub activity score is 46.10. There are still a few gaps to review before outreach.",
+      "semantic_score": 0.7641482353210449,
+      "career_score": 0.735,
+      "skill_score": 0.7266666666666667,
+      "behavior_score": 0.5162665254970312,
+      "education_score": 0.0,
+      "consistency_score": 0.0,
+      "weighted_final_score": 0.5956862925554303,
+      "confidence": 0.7768367741979885,
+      "matched_evidence": [
+        "Machine Learning Engineer",
+        "production",
+        "machine learning",
+        "feature engineering",
+        "HealthTech AI",
+        "EdTech",
+        "tensorflow",
+        "pytorch",
+        "Profile completeness",
+        "Verified email",
+        "Verified phone",
+        "LinkedIn connected",
+        "Recruiter profile views",
+        "Saved by recruiters",
+        "Search appearance",
+        "High offer acceptance rate",
+        "Moderate notice period",
+        "Flexible work mode",
+        "Professional connections",
+        "Received endorsements"
+      ],
+      "missing_evidence": [
+        "python",
+        "machine learning",
+        "deep learning",
+        "sql",
+        "Inactive profile",
+        "No recent applications",
+        "GitHub activity unavailable",
+        "Low interview completion rate",
+        "Not open to work",
+        "Not willing to relocate",
+        "Inactive profile risk",
+        "Low recruiter engagement risk",
+        "Poor hiring reliability risk"
+      ],
+      "component_scores": {
+        "semantic": 0.7641482353210449,
+        "career": 0.735,
+        "skill": 0.7266666666666667,
+        "behavior": 0.5162665254970312,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "component_confidences": {
+        "semantic": 0.7641482353210449,
+        "career": 0.8,
+        "skill": 0.7333333333333334,
+        "behavior": 0.8276551844716529,
+        "education": 0.0,
+        "consistency": 0.0
+      },
+      "metadata": {
+        "parsed_job_id": "CHALLENGE_JOB_001",
+        "retrieval_rank": 12,
+        "retrieval_similarity": 0.7641482353210449,
+        "component_scores": {
+          "semantic": 0.7641482353210449,
+          "career": 0.735,
+          "skill": 0.7266666666666667,
+          "behavior": 0.5162665254970312,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "component_confidences": {
+          "semantic": 0.7641482353210449,
+          "career": 0.8,
+          "skill": 0.7333333333333334,
+          "behavior": 0.8276551844716529,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "partial_scores": {
+          "semantic": 0.7641482353210449,
+          "career": 0.735,
+          "skill": 0.7266666666666667,
+          "behavior": 0.5162665254970312,
+          "education": 0.0,
+          "consistency": 0.0
+        },
+        "scorer_metadata": {
+          "career": {
+            "component": "career",
+            "partial_scores": {
+              "role_relevance": 1.0,
+              "responsibilities": 0.3,
+              "progression": 0.7,
+              "industry_match": 1.0,
+              "relevant_experience": 0.7
+            },
+            "evidence_count": 6
+          },
+          "skill": {
+            "component": "skill",
+            "partial_scores": {
+              "required_match": 0.3333333333333333,
+              "preferred_match": 1.0,
+              "proficiency": 1.0,
+              "duration": 1.0,
+              "endorsement": 1.0,
+              "technology_coverage": 1.0,
+              "diversity": 0.2
+            },
+            "evidence_count": 10
+          },
+          "behavior": {
+            "component": "behavior",
+            "partial_scores": {
+              "profile_quality": 1.0,
+              "recruiter_interest": 0.6112449540347696,
+              "candidate_activity": 0.07783672443897091,
+              "hiring_reliability": 0.6150000000000001,
+              "availability": 0.7000310506313416,
+              "professional_network": 0.8273817046363777,
+              "risk_penalties": 0.11528008991840001,
+              "score_before_penalty": 0.6315466154154312
+            },
+            "evidence_count": 21
+          },
+          "education": {
+            "available": false
+          },
+          "consistency": {
+            "available": false
+          }
+        }
+      }
+    }
+  ],
+  "artifact_paths": {
+    "submission_csv": "outputs\\submission.csv",
+    "ranking_json": "C:\\Projects\\India-Runs\\outputs\\ranking.json",
+    "pipeline_report": "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json",
+    "submission_metadata": "C:\\Projects\\India-Runs\\submission_metadata.yaml",
+    "faiss_index": "C:\\Projects\\India-Runs\\artifacts\\faiss\\faiss.index",
+    "candidate_lookup": "C:\\Projects\\India-Runs\\artifacts\\faiss\\candidate_lookup.pkl",
+    "embedding_metadata": "C:\\Projects\\India-Runs\\artifacts\\faiss\\embedding_metadata.pkl"
+  }
+}

@@ -21,6 +21,7 @@ from src.scoring.hybrid_ranker import HybridRanker
 from src.scoring.career_scorer import CareerScorer
 from src.scoring.skill_scorer import SkillScorer
 from src.scoring.behavior_scorer import BehaviorScorer
+from src.submission import CandidateResolver, SubmissionGenerator
 from src.retrieval.retriever import Retriever
 from src.pipeline.offline_pipeline import OfflineIndexBuilder
 
@@ -72,26 +73,8 @@ def _offline_artifacts_exist() -> bool:
     return all(path.exists() for path in required_artifacts)
 
 
-def _build_candidate_resolver(candidates_jsonl_path: Path):
-    """Build a lazy resolver that loads candidate objects from the source JSONL once."""
-    parser = CandidateParser()
-    cache = {}
-    loaded = False
-
-    def resolve(candidate_id: str):
-        nonlocal loaded
-        if not loaded:
-            with candidates_jsonl_path.open("r", encoding="utf-8") as handle:
-                for line in handle:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    candidate = parser.from_jsonl_line(line)
-                    cache[candidate.candidate_id] = candidate
-            loaded = True
-        return cache.get(candidate_id)
-
-    return resolve
+def _candidates_jsonl_path() -> Path:
+    return PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "candidates.jsonl"
 
 
 def main(force_rebuild: bool = False) -> int:
@@ -185,8 +168,7 @@ def main(force_rebuild: bool = False) -> int:
         print(f"  - Has match 'Python': {score_result.has_match('Python')}")
         print(f"  - Has missing 'ML': {score_result.has_missing('Machine Learning')}")
 
-        # Note: HybridRanker is abstract, so we can't instantiate it directly
-        print("✓ HybridRanker interface imported (abstract class)")
+        print("✓ HybridRanker imported")
         print("\n✓ Scoring infrastructure working correctly")
 
     except Exception as e:
@@ -491,17 +473,17 @@ def main(force_rebuild: bool = False) -> int:
         if "parsed_job" not in locals():
             print("⚠ Parsed job unavailable; skipping HybridRanker demo")
         else:
-            candidates_jsonl = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "candidates.jsonl"
+            candidates_jsonl = _candidates_jsonl_path()
             if not candidates_jsonl.exists():
                 print(f"⚠ Candidates JSONL file not found: {candidates_jsonl}")
             else:
-                candidate_resolver = _build_candidate_resolver(candidates_jsonl)
+                candidate_resolver = CandidateResolver(candidates_jsonl)
                 ranker = HybridRanker(
                     retriever=retriever,
-                    candidate_resolver=candidate_resolver,
+                    candidate_resolver=candidate_resolver.resolve,
                 )
 
-                ranked_results = ranker.rank_candidates(parsed_job, top_k=10)
+                ranked_results = ranker.rank_candidates(parsed_job, top_k=100)
 
                 print(f"\nRetrieved Candidates ({len(ranker.last_retrieved_candidates)}):")
                 for item in ranker.last_retrieved_candidates[:10]:
@@ -527,13 +509,46 @@ def main(force_rebuild: bool = False) -> int:
 
                 print("\n✓ HybridRanker working correctly")
 
+                print("\nGenerating submission artifacts...")
+                generator = SubmissionGenerator()
+                submission_result = generator.generate_submission(
+                    parsed_job=parsed_job,
+                    ranked_results=ranked_results,
+                    candidate_resolver=candidate_resolver.resolve,
+                    top_n=100,
+                    submission_csv_path=OUTPUTS_DIR / "submission.csv",
+                    ranking_json_path=OUTPUTS_DIR / "ranking.json",
+                    pipeline_report_path=OUTPUTS_DIR / "pipeline_report.json",
+                    metadata_path=PROJECT_ROOT / "submission_metadata.yaml",
+                    candidate_exists=candidate_resolver.has,
+                    retrieval_results=ranker.last_retrieved_candidates,
+                    timings={
+                        "retrieval_latency_seconds": 0.0,
+                        "reranking_latency_seconds": 0.0,
+                    },
+                    artifact_paths={
+                        "faiss_index": str(ARTIFACTS_DIR / "faiss" / "faiss.index"),
+                        "candidate_lookup": str(ARTIFACTS_DIR / "faiss" / "candidate_lookup.pkl"),
+                        "embedding_metadata": str(ARTIFACTS_DIR / "faiss" / "embedding_metadata.pkl"),
+                    },
+                    configuration={"top_k": 100},
+                    ai_tools_used=["GitHub Copilot"],
+                )
+
+                print("✓ Submission validation PASSED")
+                print(f"  Submission rows: {len(submission_result['rows'])}")
+                print(f"  Submission CSV: {submission_result['submission_csv_path']}")
+                print(f"  Ranking JSON: {submission_result['ranking_json_path']}")
+                print(f"  Pipeline report: {submission_result['pipeline_report_path']}")
+                print(f"  Metadata: {submission_result['metadata_path']}")
+
     except Exception as e:
         print(f"✗ HybridRanker test failed: {e}")
         import traceback
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, BehaviorScorer, HybridRanker, JobDescriptionParser, and retrieval artifact loading are implemented.")
+    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, BehaviorScorer, HybridRanker, and submission generation are implemented.")
     return 0
 
 

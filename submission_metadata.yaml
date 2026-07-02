@@ -1,0 +1,58 @@
+team_name: ""
+
+primary_contact:
+  name: ""
+  email: ""
+  phone: ""
+
+team_members: []
+
+github_repo: ""
+sandbox_link: ""
+reproduce_command: "python rank.py --job job_description.json --top-k 100 --output outputs/submission.csv"
+
+compute:
+  platform: "Windows-11-10.0.26200-SP0"
+  cpu_cores: 8
+  ram_gb: null
+  python_version: "3.12.4"
+  os: "Windows-11-10.0.26200-SP0"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: true
+  pre_computation_time_minutes: 0
+
+ai_tools_used:
+  - GitHub Copilot
+
+ai_usage_summary: |
+  Used GitHub Copilot for implementation support. No candidate data was sent to any external LLM service during ranking.
+
+methodology_summary: |
+  Deterministic retrieval-plus-ranking pipeline. FAISS retrieves the top-K candidates from precomputed embeddings, then HybridRanker combines semantic similarity with CareerScorer, SkillScorer, and BehaviorScorer. Submission rows are generated from live candidate evidence and validated before export.
+
+pipeline_summary: |
+  The pipeline loads existing FAISS artifacts, parses the job description, retrieves top-K candidates, reranks them with the hybrid scorer stack, generates submission CSV and JSON artifacts, validates the output, and writes the pipeline report plus metadata YAML.
+
+artifact_summary:
+  submission_csv: "outputs\submission.csv"
+  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
+  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
+  faiss_index: "artifacts\faiss\faiss.index"
+  candidate_lookup: "artifacts\faiss\candidate_lookup.pkl"
+  embedding_metadata: "artifacts\faiss\embedding_metadata.pkl"
+
+configuration:
+  job_id: "CHALLENGE_JOB_001"
+  job_title: "Machine Learning Engineer"
+  top_k: 100
+  output_csv: "outputs\submission.csv"
+  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
+  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
+
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: false
+  reproduction_tested: true

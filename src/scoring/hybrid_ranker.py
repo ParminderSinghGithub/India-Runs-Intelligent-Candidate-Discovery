@@ -77,6 +77,15 @@ class HybridRanker:
         retrieval_results = self.retriever.search(query_text, k=top_k)
         self.last_retrieved_candidates = retrieval_results
 
+        return self.rank_retrieval_results(parsed_job, retrieval_results)
+
+    def rank_retrieval_results(
+        self,
+        parsed_job: ParsedJob,
+        retrieval_results: List[Dict[str, Any]],
+    ) -> List[HybridScoreResult]:
+        """Score an already-retrieved candidate list without calling FAISS again."""
+
         ranked_results: List[HybridScoreResult] = []
         for retrieval_result in retrieval_results:
             candidate = self._resolve_candidate(retrieval_result["candidate_id"])
