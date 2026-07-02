@@ -17,6 +17,7 @@ from .candidate_filters import CandidateFilters
 from .parsed_job import ParsedJob
 from .retrieval_document import RetrievalDocument
 from .offline_index_result import OfflineIndexResult
+from .hybrid_score_result import HybridScoreResult
 
 __all__ = [
     "Candidate",
@@ -37,4 +38,5 @@ __all__ = [
     "ParsedJob",
     "RetrievalDocument",
     "OfflineIndexResult",
+    "HybridScoreResult",
 ]

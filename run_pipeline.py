@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from pathlib import Path
 
 from src.config import (
     FAISS_DIR,
@@ -69,6 +70,28 @@ def _offline_artifacts_exist() -> bool:
         FAISS_DIR / "embedding_metadata.pkl",
     ]
     return all(path.exists() for path in required_artifacts)
+
+
+def _build_candidate_resolver(candidates_jsonl_path: Path):
+    """Build a lazy resolver that loads candidate objects from the source JSONL once."""
+    parser = CandidateParser()
+    cache = {}
+    loaded = False
+
+    def resolve(candidate_id: str):
+        nonlocal loaded
+        if not loaded:
+            with candidates_jsonl_path.open("r", encoding="utf-8") as handle:
+                for line in handle:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    candidate = parser.from_jsonl_line(line)
+                    cache[candidate.candidate_id] = candidate
+            loaded = True
+        return cache.get(candidate_id)
+
+    return resolve
 
 
 def main(force_rebuild: bool = False) -> int:
@@ -462,7 +485,55 @@ def main(force_rebuild: bool = False) -> int:
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, BehaviorScorer, JobDescriptionParser, and retrieval artifact loading are implemented.")
+    # Test HybridRanker
+    print("\nTesting HybridRanker...")
+    try:
+        if "parsed_job" not in locals():
+            print("⚠ Parsed job unavailable; skipping HybridRanker demo")
+        else:
+            candidates_jsonl = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "candidates.jsonl"
+            if not candidates_jsonl.exists():
+                print(f"⚠ Candidates JSONL file not found: {candidates_jsonl}")
+            else:
+                candidate_resolver = _build_candidate_resolver(candidates_jsonl)
+                ranker = HybridRanker(
+                    retriever=retriever,
+                    candidate_resolver=candidate_resolver,
+                )
+
+                ranked_results = ranker.rank_candidates(parsed_job, top_k=10)
+
+                print(f"\nRetrieved Candidates ({len(ranker.last_retrieved_candidates)}):")
+                for item in ranker.last_retrieved_candidates[:10]:
+                    metadata = item.get("metadata", {})
+                    print(f"  - {item['rank']}: {item['candidate_id']} | semantic={item['similarity']:.4f} | {metadata.get('title', 'N/A')}")
+
+                print(f"\nTop 10 Ranking:")
+                for rank, result in enumerate(ranked_results[:10], start=1):
+                    partial_scores = result.metadata.get("partial_scores", {})
+                    print(f"\nRank {rank}")
+                    print(f"  Candidate: {result.candidate_id}")
+                    print(f"  Semantic: {result.semantic_score:.2f}")
+                    print(f"  Career: {result.career_score:.2f}")
+                    print(f"  Skill: {result.skill_score:.2f}")
+                    print(f"  Behavior: {result.behavior_score:.2f}")
+                    print(f"  Education: {result.education_score:.2f}")
+                    print(f"  Consistency: {result.consistency_score:.2f}")
+                    print(f"  Final: {result.weighted_final_score:.2f}")
+                    print(f"  Confidence: {result.confidence:.2f}")
+                    print(f"  Matched Evidence: {', '.join(result.matched_items[:8]) if result.matched_items else 'None'}")
+                    print(f"  Missing Evidence: {', '.join(result.missing_items[:8]) if result.missing_items else 'None'}")
+                    print(f"  Partial Scores: {partial_scores}")
+
+                print("\n✓ HybridRanker working correctly")
+
+    except Exception as e:
+        print(f"✗ HybridRanker test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, BehaviorScorer, HybridRanker, JobDescriptionParser, and retrieval artifact loading are implemented.")
     return 0
 
 
