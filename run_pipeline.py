@@ -19,6 +19,7 @@ from src.models.scoring_context import ScoringContext
 from src.scoring.hybrid_ranker import HybridRanker
 from src.scoring.career_scorer import CareerScorer
 from src.scoring.skill_scorer import SkillScorer
+from src.scoring.behavior_scorer import BehaviorScorer
 from src.retrieval.retriever import Retriever
 from src.pipeline.offline_pipeline import OfflineIndexBuilder
 
@@ -297,6 +298,62 @@ def main(force_rebuild: bool = False) -> int:
         traceback.print_exc()
         return 1
 
+    # Test BehaviorScorer
+    print("\nTesting BehaviorScorer...")
+    try:
+        job_file = PROJECT_ROOT / "job_description.json"
+
+        if not job_file.exists():
+            print(f"⚠ Job description file not found: {job_file}")
+        else:
+            job_parser = JobDescriptionParser()
+            parsed_job = job_parser.parse_from_file(job_file)
+
+            context = ScoringContext(
+                candidate=candidate,
+                job_description=parsed_job.job_description,
+                config={"parsed_job": parsed_job},
+            )
+
+            behavior_scorer = BehaviorScorer()
+            behavior_result = behavior_scorer.score(context)
+
+            print(f"\nBehavior Score: {behavior_result.score:.2f}")
+            print(f"Confidence: {behavior_result.confidence:.2f}")
+
+            print(f"\nMatched Signals ({len(behavior_result.matched_items)}):")
+            for signal in behavior_result.matched_items[:10]:
+                print(f"  - {signal}")
+            if len(behavior_result.matched_items) > 10:
+                print(f"  ... and {len(behavior_result.matched_items) - 10} more")
+
+            print(f"\nMissing Signals ({len(behavior_result.missing_items)}):")
+            for signal in behavior_result.missing_items[:10]:
+                print(f"  - {signal}")
+            if len(behavior_result.missing_items) > 10:
+                print(f"  ... and {len(behavior_result.missing_items) - 10} more")
+
+            print(f"\nReasons ({len(behavior_result.reasons)}):")
+            for reason in behavior_result.reasons[:10]:
+                print(f"  - {reason}")
+            if len(behavior_result.reasons) > 10:
+                print(f"  ... and {len(behavior_result.reasons) - 10} more")
+
+            print(f"\nPartial Scores:")
+            partial_scores = behavior_result.get_metadata("partial_scores", {})
+            for name, value in partial_scores.items():
+                print(f"  - {name}: {value:.2f}")
+
+            print(f"\nEvidence Count: {behavior_result.get_metadata('evidence_count', 0)}")
+
+            print("\n✓ BehaviorScorer working correctly")
+
+    except Exception as e:
+        print(f"✗ BehaviorScorer test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
     # Test JobDescriptionParser
     print("\nTesting JobDescriptionParser...")
     try:
@@ -405,7 +462,7 @@ def main(force_rebuild: bool = False) -> int:
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, JobDescriptionParser, and retrieval artifact loading are implemented.")
+    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, BehaviorScorer, JobDescriptionParser, and retrieval artifact loading are implemented.")
     return 0
 
 
