@@ -88,14 +88,25 @@ class EmbeddingEngine:
 
             logger.info(f"Using device: {self._actual_device}")
 
-            # Load model
-            self._model = SentenceTransformer(
-                self.model_name,
-                device=self._actual_device,
-            )
+            # Load model from local cache first to avoid unnecessary network checks.
+            try:
+                self._model = SentenceTransformer(
+                    self.model_name,
+                    device=self._actual_device,
+                    local_files_only=True,
+                )
+            except Exception:
+                logger.info("Local model cache unavailable; falling back to online resolution")
+                self._model = SentenceTransformer(
+                    self.model_name,
+                    device=self._actual_device,
+                )
 
             # Get embedding dimension
-            self._embedding_dim = self._model.get_sentence_embedding_dimension()
+            if hasattr(self._model, "get_embedding_dimension"):
+                self._embedding_dim = self._model.get_embedding_dimension()
+            else:
+                self._embedding_dim = self._model.get_sentence_embedding_dimension()
             logger.info(f"Model loaded. Embedding dimension: {self._embedding_dim}")
 
             return self._model

@@ -14,16 +14,22 @@ class JobDescription:
     location: Optional[str] = None
     description: Optional[str] = None
     required_skills: List[str] = None
+    preferred_skills: List[str] = None
     required_experience_years: Optional[float] = None
     required_education: Optional[str] = None
     responsibilities: List[str] = None
     behaviors: List[str] = None
+    technologies: List[str] = None
 
     def __post_init__(self) -> None:
         """Initialize default values for mutable fields."""
         if self.required_skills is None:
             object.__setattr__(self, "required_skills", [])
+        if self.preferred_skills is None:
+            object.__setattr__(self, "preferred_skills", [])
         if self.responsibilities is None:
             object.__setattr__(self, "responsibilities", [])
         if self.behaviors is None:
             object.__setattr__(self, "behaviors", [])
+        if self.technologies is None:
+            object.__setattr__(self, "technologies", [])

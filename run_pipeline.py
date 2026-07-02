@@ -1,9 +1,10 @@
 """Main entry point for the India Runs Data & AI Challenge pipeline."""
 
+import argparse
 import sys
-from pathlib import Path
 
 from src.config import (
+    FAISS_DIR,
     PROJECT_ROOT,
     SRC_DIR,
     TESTS_DIR,
@@ -17,9 +18,8 @@ from src.models.score_result import ScoreResult
 from src.models.scoring_context import ScoringContext
 from src.scoring.hybrid_ranker import HybridRanker
 from src.scoring.career_scorer import CareerScorer
-from src.retrieval.document_builder import RetrievalDocumentBuilder
+from src.scoring.skill_scorer import SkillScorer
 from src.retrieval.retriever import Retriever
-from src.embeddings.embedder import EmbeddingEngine
 from src.pipeline.offline_pipeline import OfflineIndexBuilder
 
 
@@ -60,7 +60,17 @@ def verify_project_structure() -> bool:
     return all_exist
 
 
-def main() -> int:
+def _offline_artifacts_exist() -> bool:
+    """Check whether the production FAISS artifacts are already present."""
+    required_artifacts = [
+        FAISS_DIR / "faiss.index",
+        FAISS_DIR / "candidate_lookup.pkl",
+        FAISS_DIR / "embedding_metadata.pkl",
+    ]
+    return all(path.exists() for path in required_artifacts)
+
+
+def main(force_rebuild: bool = False) -> int:
     """Main entry point for the pipeline.
 
     Returns:
@@ -216,6 +226,77 @@ def main() -> int:
         traceback.print_exc()
         return 1
 
+    # Test SkillScorer
+    print("\nTesting SkillScorer...")
+    try:
+        # Use the sample candidate and parsed job from CareerScorer test
+        candidates_file = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
+
+        if not candidates_file.exists():
+            print(f"⚠ Candidates file not found: {candidates_file}")
+        else:
+            import json
+
+            # Load candidates from JSON array
+            with open(candidates_file, "r", encoding="utf-8") as f:
+                candidates_data = json.load(f)
+
+            parser = CandidateParser()
+            candidates = [parser.from_dict(cand_data) for cand_data in candidates_data]
+
+            # Use first candidate
+            candidate = candidates[0]
+
+            # Parse job description
+            job_file = PROJECT_ROOT / "job_description.json"
+
+            if not job_file.exists():
+                print(f"⚠ Job description file not found: {job_file}")
+            else:
+                job_parser = JobDescriptionParser()
+                parsed_job = job_parser.parse_from_file(job_file)
+
+                # Create scoring context
+                context = ScoringContext(
+                    candidate=candidate,
+                    job_description=parsed_job.job_description,
+                    config={"parsed_job": parsed_job},
+                )
+
+                # Score with SkillScorer
+                skill_scorer = SkillScorer()
+                skill_result = skill_scorer.score(context)
+
+                print(f"\nSkill Score: {skill_result.score:.2f}")
+                print(f"Confidence: {skill_result.confidence:.2f}")
+
+                print(f"\nMatched Skills ({len(skill_result.matched_items)}):")
+                for skill in skill_result.matched_items[:10]:
+                    print(f"  - {skill}")
+
+                print(f"\nMissing Skills ({len(skill_result.missing_items)}):")
+                for skill in skill_result.missing_items[:10]:
+                    print(f"  - {skill}")
+
+                print(f"\nReasons ({len(skill_result.reasons)}):")
+                for reason in skill_result.reasons[:10]:
+                    print(f"  - {reason}")
+
+                print(f"\nPartial Scores:")
+                partial_scores = skill_result.get_metadata("partial_scores", {})
+                for name, value in partial_scores.items():
+                    print(f"  - {name}: {value:.2f}")
+
+                print(f"\nEvidence Count: {skill_result.get_metadata('evidence_count', 0)}")
+
+                print("\n✓ SkillScorer working correctly")
+
+    except Exception as e:
+        print(f"✗ SkillScorer test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
     # Test JobDescriptionParser
     print("\nTesting JobDescriptionParser...")
     try:
@@ -264,214 +345,76 @@ def main() -> int:
         traceback.print_exc()
         return 1
 
-    # Test RetrievalDocumentBuilder
-    print("\nTesting RetrievalDocumentBuilder...")
+    # Test retrieval pipeline using existing artifacts by default.
+    print("\nTesting retrieval pipeline...")
     try:
-        doc_builder = RetrievalDocumentBuilder()
-        retrieval_doc = doc_builder.build(candidate)
-
-        print(f"\nCandidate ID: {retrieval_doc.candidate_id}")
-        print(f"\nDocument Preview (first 500 chars):")
-        print(retrieval_doc.document[:500])
-        if len(retrieval_doc.document) > 500:
-            print("...")
-
-        print(f"\nMetadata:")
-        print(f"  Title: {retrieval_doc.get_metadata('title')}")
-        print(f"  Location: {retrieval_doc.get_metadata('location')}")
-        print(f"  Experience Years: {retrieval_doc.get_metadata('experience_years')}")
-        print(f"  Number of Skills: {retrieval_doc.get_metadata('number_of_skills')}")
-        print(f"  Number of Career Entries: {retrieval_doc.get_metadata('number_of_career_entries')}")
-        print(f"  Document Length: {retrieval_doc.get_metadata('document_length')} chars")
-        print(f"  Document Word Count: {retrieval_doc.get_metadata('document_word_count')} words")
-        print(f"  Section Count: {retrieval_doc.get_metadata('section_count')}")
-        print(f"  Sections: {retrieval_doc.get_metadata('sections')}")
-
-        print(f"\nFull Document:")
-        print(retrieval_doc.document)
-
-        print("\n✓ RetrievalDocumentBuilder working correctly")
-
-    except Exception as e:
-        print(f"✗ RetrievalDocumentBuilder test failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return 1
-
-    # Test EmbeddingEngine
-    print("\nTesting EmbeddingEngine...")
-    try:
-        import time
-
-        # Parse 20 sample candidates
-        candidates_file = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
-
-        if not candidates_file.exists():
-            print(f"⚠ Candidates file not found: {candidates_file}")
-        else:
-            import json
-
-            # Load candidates from JSON array
-            with open(candidates_file, "r", encoding="utf-8") as f:
-                candidates_data = json.load(f)
-
-            parser = CandidateParser()
-            candidates = [parser.from_dict(cand_data) for cand_data in candidates_data]
-
-            # Limit to 20 candidates for testing
-            candidates = candidates[:20]
-            print(f"Parsed {len(candidates)} candidates for embedding test")
-
-            # Generate RetrievalDocument objects
-            doc_builder = RetrievalDocumentBuilder()
-            retrieval_docs = [doc_builder.build(cand) for cand in candidates]
-
-            print(f"Generated {len(retrieval_docs)} retrieval documents")
-
-            # Initialize embedding engine
-            embedder = EmbeddingEngine()
-
-            # Load model
-            embedder.load_model()
-            print(f"Embedding model: {embedder.model_name}")
-            print(f"Embedding dimension: {embedder.get_embedding_dimension()}")
-
-            # Embed documents
-            start_time = time.time()
-            embeddings = embedder.embed_documents(retrieval_docs, show_progress=True)
-            embedding_time = time.time() - start_time
-
-            print(f"\nNumber of documents: {len(retrieval_docs)}")
-            print(f"Embedding matrix shape: {embeddings.shape}")
-            print(f"Embedding time: {embedding_time:.2f}s")
-            print(f"Average time per document: {embedding_time / len(retrieval_docs):.3f}s")
-
-            # Save embeddings
-            candidate_ids = [doc.candidate_id for doc in retrieval_docs]
-            metadata = [doc.metadata for doc in retrieval_docs]
-            cache_path = embedder.save_embeddings(embeddings, candidate_ids, metadata, cache_name="test_embeddings")
-
-            print(f"Cache location: {cache_path}")
-
-            # Test loading embeddings
-            loaded_embeddings, loaded_ids, loaded_metadata = embedder.load_embeddings(cache_name="test_embeddings")
-            print(f"Loaded embeddings shape: {loaded_embeddings.shape}")
-            print(f"Loaded candidate IDs: {len(loaded_ids)}")
-
-            print("\n✓ EmbeddingEngine working correctly")
-
-    except Exception as e:
-        print(f"✗ EmbeddingEngine test failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return 1
-
-    # Test Retriever
-    print("\nTesting Retriever...")
-    try:
-        # Use the same 20 candidates from embedding test
-        candidates_file = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
-
-        if not candidates_file.exists():
-            print(f"⚠ Candidates file not found: {candidates_file}")
-        else:
-            import json
-
-            # Load candidates from JSON array
-            with open(candidates_file, "r", encoding="utf-8") as f:
-                candidates_data = json.load(f)
-
-            parser = CandidateParser()
-            candidates = [parser.from_dict(cand_data) for cand_data in candidates_data]
-
-            # Limit to 20 candidates for testing
-            candidates = candidates[:20]
-            print(f"Parsed {len(candidates)} candidates for retrieval test")
-
-            # Generate RetrievalDocument objects
-            doc_builder = RetrievalDocumentBuilder()
-            retrieval_docs = [doc_builder.build(cand) for cand in candidates]
-
-            print(f"Generated {len(retrieval_docs)} retrieval documents")
-
-            # Initialize retriever with force_rebuild to test building
-            retriever = Retriever(force_rebuild=True)
-
-            # Build index
-            retriever.build_index(retrieval_docs, show_progress=True)
-            print(f"Index built with {retriever.get_index_size()} candidates")
-
-            # Test search
-            query = "machine learning engineer python tensorflow"
-            print(f"\nSearching for: {query}")
-            results = retriever.search(query, k=5)
-
-            print(f"\nTop 5 Results:")
-            for result in results:
-                rank = result["rank"]
-                candidate_id = result["candidate_id"]
-                similarity = result["similarity"]
-                metadata = result["metadata"]
-                title = metadata.get("title", "N/A")
-                experience = metadata.get("experience_years", "N/A")
-
-                print(f"\n  Rank {rank}:")
-                print(f"    Candidate ID: {candidate_id}")
-                print(f"    Similarity: {similarity:.4f}")
-                print(f"    Current Title: {title}")
-                print(f"    Years Experience: {experience}")
-
-            # Test loading existing index
-            print("\nTesting index loading...")
-            retriever2 = Retriever(force_rebuild=False)
-            retriever2.load_index()
-            print(f"Loaded index with {retriever2.get_index_size()} candidates")
-
-            # Test search on loaded index
-            results2 = retriever2.search(query, k=5)
-            print(f"Search on loaded index returned {len(results2)} results")
-
-            print("\n✓ Retriever working correctly")
-
-    except Exception as e:
-        print(f"✗ Retriever test failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return 1
-
-    # Test OfflineIndexBuilder
-    print("\nTesting OfflineIndexBuilder...")
-    try:
-        # Use the candidates JSONL file
         candidates_jsonl = PROJECT_ROOT / "[PUB] India_runs_data_and_ai_challenge" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "candidates.jsonl"
+        artifacts_exist = _offline_artifacts_exist()
 
-        if not candidates_jsonl.exists():
-            print(f"⚠ Candidates JSONL file not found: {candidates_jsonl}")
+        if artifacts_exist and not force_rebuild:
+            print("✓ Existing FAISS artifacts detected. Skipping offline rebuild.")
+            retriever = Retriever(force_rebuild=False)
+            retriever.load_index()
+            print(f"Loaded index with {retriever.get_index_size()} candidates")
         else:
-            # Initialize offline index builder
-            builder = OfflineIndexBuilder()
+            if not candidates_jsonl.exists():
+                print(f"⚠ Candidates JSONL file not found: {candidates_jsonl}")
+                return 1
 
-            # Build index with max_candidates=20 for testing
+            if force_rebuild:
+                print("Rebuilding offline artifacts because --rebuild-index was requested.")
+            else:
+                print("Offline artifacts are missing. Rebuilding the index to restore pipeline state.")
+
+            builder = OfflineIndexBuilder()
             result = builder.build_candidate_index(
                 candidates_jsonl_path=candidates_jsonl,
-                max_candidates=20,
                 force_rebuild=True,
             )
 
-            # Print result summary
             print("\n" + str(result))
 
-            print("\n✓ OfflineIndexBuilder working correctly")
+            retriever = Retriever(force_rebuild=False)
+            retriever.load_index()
+            print(f"Loaded index with {retriever.get_index_size()} candidates")
+
+        query = "machine learning engineer python tensorflow"
+        print(f"\nSearching for: {query}")
+        results = retriever.search(query, k=5)
+
+        print(f"\nTop 5 Results:")
+        for result in results:
+            rank = result["rank"]
+            candidate_id = result["candidate_id"]
+            similarity = result["similarity"]
+            metadata = result["metadata"]
+            title = metadata.get("title", "N/A")
+            experience = metadata.get("experience_years", "N/A")
+
+            print(f"\n  Rank {rank}:")
+            print(f"    Candidate ID: {candidate_id}")
+            print(f"    Similarity: {similarity:.4f}")
+            print(f"    Current Title: {title}")
+            print(f"    Years Experience: {experience}")
+
+        print("\n✓ Retrieval pipeline validated")
 
     except Exception as e:
-        print(f"✗ OfflineIndexBuilder test failed: {e}")
+        print(f"✗ Retrieval pipeline test failed: {e}")
         import traceback
         traceback.print_exc()
         return 1
 
-    print("\nPipeline ready. Parser, CareerScorer, JobDescriptionParser, RetrievalDocumentBuilder, EmbeddingEngine, Retriever, and OfflineIndexBuilder implemented.")
+    print("\nPipeline ready. Parser, CareerScorer, SkillScorer, JobDescriptionParser, and retrieval artifact loading are implemented.")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description="Run the India Runs challenge pipeline")
+    parser.add_argument(
+        "--rebuild-index",
+        action="store_true",
+        help="Force rebuild of offline FAISS artifacts.",
+    )
+    args = parser.parse_args()
+    sys.exit(main(force_rebuild=args.rebuild_index))
