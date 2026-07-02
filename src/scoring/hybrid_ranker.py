@@ -6,6 +6,8 @@ import logging
 import re
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
+from src.utils.logging import stage_log
+
 from src.config import (
     BEHAVIOR_WEIGHT,
     CAREER_WEIGHT,
@@ -75,10 +77,24 @@ class HybridRanker:
             return []
 
         query_text = self._get_query_text(parsed_job)
-        retrieval_results = self.retriever.search(query_text, k=top_k)
+        logger.info(
+            "[HybridRanker] START rank_candidates -- job='%s', top_k=%d",
+            parsed_job.job_description.job_id,
+            top_k,
+        )
+        with stage_log(logger, "FAISS retrieval", count_label=f"top_k={top_k}"):
+            retrieval_results = self.retriever.search(query_text, k=top_k)
         self.last_retrieved_candidates = retrieval_results
+        logger.info("[HybridRanker] Retrieved %d candidates from FAISS", len(retrieval_results))
 
-        return self.rank_retrieval_results(parsed_job, retrieval_results)
+        with stage_log(logger, "Hybrid re-ranking", count_label=f"{len(retrieval_results)} candidates"):
+            results = self.rank_retrieval_results(parsed_job, retrieval_results)
+
+        logger.info(
+            "[HybridRanker] END rank_candidates -- ranked %d candidates",
+            len(results),
+        )
+        return results
 
     def rank_retrieval_results(
         self,
@@ -86,6 +102,10 @@ class HybridRanker:
         retrieval_results: List[Dict[str, Any]],
     ) -> List[HybridScoreResult]:
         """Score an already-retrieved candidate list without calling FAISS again."""
+        logger.info(
+            "[HybridRanker] START rank_retrieval_results -- %d candidates to score",
+            len(retrieval_results),
+        )
 
         ranked_results: List[HybridScoreResult] = []
         for retrieval_result in retrieval_results:
@@ -106,6 +126,10 @@ class HybridRanker:
             ranked_results.append(self.calculate_hybrid_score(candidate_context))
 
         ranked_results.sort(key=self._sort_key)
+        logger.info(
+            "[HybridRanker] END rank_retrieval_results -- scored and sorted %d candidates",
+            len(ranked_results),
+        )
         return ranked_results
 
     def calculate_hybrid_score(self, context: ScoringContext) -> HybridScoreResult:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 import re
 from pathlib import Path
 from typing import Callable, List, Optional, Sequence
@@ -13,6 +14,7 @@ from src.utils.exceptions import ValidationError
 REQUIRED_HEADER = ["candidate_id", "rank", "score", "reasoning"]
 CANDIDATE_ID_PATTERN = re.compile(r"^CAND_[0-9]{7}$")
 EXPECTED_ROWS = 100
+MAX_REASONING_CHARACTERS = 1000
 
 
 class SubmissionValidator:
@@ -32,6 +34,7 @@ class SubmissionValidator:
 
         seen_ids = set()
         seen_ranks = set()
+        seen_reasoning = set()
         previous_score = None
         previous_candidate_id = None
 
@@ -62,15 +65,29 @@ class SubmissionValidator:
                 errors.append(f"Row {row_num}: duplicate rank {row.rank}.")
             else:
                 seen_ranks.add(row.rank)
+                if row.rank != position:
+                    errors.append(
+                        f"Row {row_num}: rank must be strictly increasing; expected {position}, found {row.rank}."
+                    )
 
             if not self._is_numeric_score(row.score):
                 errors.append(f"Row {row_num}: score must be numeric.")
+            elif not math.isfinite(float(row.score)):
+                errors.append(f"Row {row_num}: score must be finite.")
             elif not 0.0 <= float(row.score) <= 1.0:
                 errors.append(f"Row {row_num}: score must be within [0, 1].")
 
             reasoning = (row.reasoning or "").strip()
             if not reasoning:
                 errors.append(f"Row {row_num}: reasoning must not be empty.")
+            elif len(reasoning) > MAX_REASONING_CHARACTERS:
+                errors.append(
+                    f"Row {row_num}: reasoning exceeds the {MAX_REASONING_CHARACTERS}-character safety limit."
+                )
+            elif reasoning in seen_reasoning:
+                errors.append(f"Row {row_num}: reasoning must be unique across candidates.")
+            else:
+                seen_reasoning.add(reasoning)
 
             if previous_score is not None and self._is_numeric_score(row.score):
                 current_score = float(row.score)

@@ -35,20 +35,20 @@ pipeline_summary: |
   The pipeline loads existing FAISS artifacts, parses the job description, retrieves top-K candidates, reranks them with the hybrid scorer stack, generates submission CSV and JSON artifacts, validates the output, and writes the pipeline report plus metadata YAML.
 
 artifact_summary:
-  submission_csv: "outputs\submission.csv"
-  ranking_json: "outputs\ranking_explanations.json"
-  pipeline_report: "outputs\pipeline_report.json"
-  faiss_index: "artifacts\faiss\faiss.index"
-  candidate_lookup: "artifacts\faiss\candidate_lookup.pkl"
-  embedding_metadata: "artifacts\faiss\embedding_metadata.pkl"
+  submission_csv: "C:\\Projects\\India-Runs\\outputs\\submission.csv"
+  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
+  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
+  faiss_index: "C:\\Projects\\India-Runs\\artifacts\\faiss\\faiss.index"
+  candidate_lookup: "C:\\Projects\\India-Runs\\artifacts\\faiss\\candidate_lookup.pkl"
+  embedding_metadata: "C:\\Projects\\India-Runs\\artifacts\\faiss\\embedding_metadata.pkl"
 
 configuration:
   job_id: "CHALLENGE_JOB_001"
   job_title: "Machine Learning Engineer"
   top_k: 100
-  output_csv: "outputs\submission.csv"
-  ranking_json: "outputs\ranking_explanations.json"
-  pipeline_report: "outputs\pipeline_report.json"
+  output_csv: "C:\\Projects\\India-Runs\\outputs\\submission.csv"
+  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
+  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
 
 declarations:
   read_submission_spec: true

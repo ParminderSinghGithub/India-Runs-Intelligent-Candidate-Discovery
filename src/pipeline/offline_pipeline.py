@@ -13,6 +13,7 @@ from src.parser.candidate_parser import CandidateParser
 from src.retrieval.document_builder import RetrievalDocumentBuilder
 from src.retrieval.retriever import Retriever
 from src.utils.exceptions import ValidationError
+from src.utils.logging import stage_log
 
 logger = logging.getLogger(__name__)
 
@@ -72,40 +73,53 @@ class OfflineIndexBuilder:
             RuntimeError: If pipeline execution fails.
         """
         start_time = time.time()
+        logger.info(
+            "[OfflineIndexBuilder] START build_candidate_index -- source: %s",
+            candidates_jsonl_path,
+        )
 
         # Validate input
         self._validate_input(candidates_jsonl_path)
 
-        print("Loading candidates...")
-        candidates_data = self._load_candidates(candidates_jsonl_path)
+        with stage_log(logger, "Loading candidates"):
+            candidates_data = self._load_candidates(candidates_jsonl_path)
         total_candidates = len(candidates_data)
+        logger.info("Loaded %d raw candidate records", total_candidates)
 
         # Apply max_candidates limit
         if max_candidates is not None and max_candidates > 0:
             candidates_data = candidates_data[:max_candidates]
-            print(f"Limited to {max_candidates} candidates for testing")
+            logger.info("Limited to %d candidates for testing", max_candidates)
 
-        print(f"Parsing {len(candidates_data)} candidates...")
-        parse_start = time.time()
-        candidates = self._parse_candidates(candidates_data)
-        parse_time = time.time() - parse_start
+        with stage_log(logger, "Parsing candidates", count_label=f"{len(candidates_data)} candidates"):
+            parse_start = time.time()
+            candidates = self._parse_candidates(candidates_data)
+            parse_time = time.time() - parse_start
+        logger.info("Parsed %d candidates successfully", len(candidates))
 
-        print("Building retrieval documents...")
-        doc_start = time.time()
-        retrieval_docs = self._build_retrieval_documents(candidates)
-        doc_time = time.time() - doc_start
+        with stage_log(logger, "Building retrieval documents", count_label=f"{len(candidates)} candidates"):
+            doc_start = time.time()
+            retrieval_docs = self._build_retrieval_documents(candidates)
+            doc_time = time.time() - doc_start
+        logger.info("Built %d retrieval documents", len(retrieval_docs))
 
-        print("Generating embeddings...")
-        embed_start = time.time()
-        embeddings = self._generate_embeddings(retrieval_docs, batch_size)
-        embedding_time = time.time() - embed_start
+        with stage_log(logger, "Generating embeddings", count_label=f"{len(retrieval_docs)} documents"):
+            embed_start = time.time()
+            embeddings = self._generate_embeddings(retrieval_docs, batch_size)
+            embedding_time = time.time() - embed_start
+        logger.info(
+            "Generated embeddings: shape=%s, dim=%d",
+            embeddings.shape,
+            embeddings.shape[1] if len(embeddings.shape) > 1 else -1,
+        )
 
-        print("Building FAISS index...")
-        index_start = time.time()
-        self._build_faiss_index(retrieval_docs, force_rebuild)
-        index_build_time = time.time() - index_start
+        with stage_log(logger, "Building FAISS index", count_label=f"{len(retrieval_docs)} vectors"):
+            index_start = time.time()
+            self._build_faiss_index(retrieval_docs, force_rebuild)
+            index_build_time = time.time() - index_start
+        logger.info("FAISS index size: %d", self.retriever.get_index_size())
 
-        print("Saving artifacts...")
+        logger.info("Collecting artifact paths")
         artifacts = self._get_artifact_paths()
 
         # Validate results
@@ -116,8 +130,6 @@ class OfflineIndexBuilder:
         )
 
         total_time = time.time() - start_time
-
-        print("Completed.")
 
         # Build result
         result = OfflineIndexResult(
@@ -136,6 +148,11 @@ class OfflineIndexBuilder:
             },
         )
 
+        logger.info(
+            "[OfflineIndexBuilder] END build_candidate_index -- processed %d candidates in %.2fs",
+            len(candidates),
+            total_time,
+        )
         return result
 
     def _validate_input(self, candidates_jsonl_path: Path) -> None:
@@ -330,4 +347,4 @@ class OfflineIndexBuilder:
             if not self.retriever.embedding_metadata:
                 raise ValidationError("Embedding metadata is empty")
 
-        print("✓ All validation checks passed")
+        logger.info("✓ All validation checks passed")
