@@ -36,8 +36,8 @@ pipeline_summary: |
 
 artifact_summary:
   submission_csv: "outputs\submission.csv"
-  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
-  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
+  ranking_json: "outputs\ranking_explanations.json"
+  pipeline_report: "outputs\pipeline_report.json"
   faiss_index: "artifacts\faiss\faiss.index"
   candidate_lookup: "artifacts\faiss\candidate_lookup.pkl"
   embedding_metadata: "artifacts\faiss\embedding_metadata.pkl"
@@ -47,8 +47,8 @@ configuration:
   job_title: "Machine Learning Engineer"
   top_k: 100
   output_csv: "outputs\submission.csv"
-  ranking_json: "C:\\Projects\\India-Runs\\outputs\\ranking.json"
-  pipeline_report: "C:\\Projects\\India-Runs\\outputs\\pipeline_report.json"
+  ranking_json: "outputs\ranking_explanations.json"
+  pipeline_report: "outputs\pipeline_report.json"
 
 declarations:
   read_submission_spec: true

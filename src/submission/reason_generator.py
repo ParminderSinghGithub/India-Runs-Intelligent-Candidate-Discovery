@@ -1,8 +1,9 @@
-"""Deterministic recruiter reasoning for final submissions."""
+"""Diverse, deterministic, evidence-backed recruiter reasoning."""
 
 from __future__ import annotations
 
-from typing import List
+import re
+from typing import List, Sequence
 
 from src.models.candidate import Candidate
 from src.models.hybrid_score_result import HybridScoreResult
@@ -10,154 +11,142 @@ from src.models.parsed_job import ParsedJob
 
 
 class ReasonGenerator:
-    """Generate natural-language recruiter reasoning from real evidence."""
+    """Render recruiter explanations without introducing unsupported claims."""
 
-    def generate(
-        self,
-        candidate: Candidate,
-        result: HybridScoreResult,
-        parsed_job: ParsedJob,
-    ) -> str:
-        """Create a concise, evidence-backed reasoning string."""
-        parts: List[str] = []
-        parts.append(self._lead_clause(candidate, result, parsed_job))
+    LEAD_TEMPLATES = {
+        "excellent": (
+            "{title} brings {years:.1f} years of experience and unusually strong career and technical alignment for this role.",
+            "The combination of {title} experience, relevant skills, and {years:.1f} years in the field makes this a leading profile.",
+            "This is a high-confidence technical fit: the candidate is a {title} with {years:.1f} years of directly useful experience.",
+            "Career trajectory and hands-on evidence both strongly support this {title} profile for the opening.",
+        ),
+        "strong": (
+            "Strong career relevance from a {title} profile with {years:.1f} years of experience in {industry}.",
+            "The candidate's {title} background provides credible role alignment, backed by {years:.1f} years of experience.",
+            "A relevant {title} trajectory and solid technical coverage place this profile among the stronger matches.",
+            "This profile aligns well through its {title} experience and sustained work in {industry}.",
+        ),
+        "technical": (
+            "Technical evidence is stronger than the title match, but the profile still covers much of the role's core work.",
+            "The candidate shows a useful technical fit, with career relevance that is credible though not exact.",
+            "Skills and production evidence carry this profile, while title alignment is more moderate.",
+            "This is primarily a capability-led match rather than a perfect title-for-title match.",
+        ),
+        "partial": (
+            "The profile has partial alignment for the role, with {years:.1f} years of experience and some relevant technical evidence.",
+            "There is a workable foundation here, although career and skill coverage are mixed.",
+            "The candidate offers transferable experience, but the evidence is less direct than for the higher-ranked profiles.",
+            "This is a moderate match: relevant signals are present, alongside material role-specific gaps.",
+        ),
+    }
 
-        skill_clause = self._skill_clause(candidate, result)
-        if skill_clause:
-            parts.append(skill_clause)
+    def generate(self, candidate: Candidate, result: HybridScoreResult, parsed_job: ParsedJob) -> str:
+        parts = [self._lead_clause(candidate, result)]
+        theme = self._specialism_clause(candidate, result)
+        if theme:
+            parts.append(theme)
+        skills = self._skill_clause(result, parsed_job)
+        if skills:
+            parts.append(skills)
+        behavior = self._behavior_clause(candidate, result)
+        if behavior:
+            parts.append(behavior)
+        gap = self._gap_clause(result, parsed_job)
+        if gap:
+            parts.append(gap)
+        return " ".join(parts)
 
-        behavior_clause = self._behavior_clause(candidate, result)
-        if behavior_clause:
-            parts.append(behavior_clause)
+    def _pick(self, candidate_id: str, choices: Sequence[str], salt: int = 0) -> str:
+        index = (sum(ord(char) for char in candidate_id) + salt) % len(choices)
+        return choices[index]
 
-        gap_clause = self._gap_clause(result)
-        if gap_clause:
-            parts.append(gap_clause)
-
-        return " ".join(part.strip() for part in parts if part).strip()
-
-    def _lead_clause(
-        self,
-        candidate: Candidate,
-        result: HybridScoreResult,
-        parsed_job: ParsedJob,
-    ) -> str:
-        profile = candidate.profile
-        title = profile.current_title or parsed_job.job_description.title
-        years = profile.years_of_experience
-        industry = profile.current_industry or "industry"
-        semantic = result.semantic_score
-        career = result.career_score
-        skill = result.skill_score
-        behavior = result.behavior_score
-
-        if career >= 0.70 and skill >= 0.70 and semantic >= 0.70:
-            return (
-                f"Strong {title} fit with {years:.1f} years in {industry} and tightly aligned career, skill, and semantic signals."
-            )
-        if skill >= 0.72 and behavior >= 0.60:
-            return (
-                f"Excellent technical match with {title} experience, supported by solid recruiter-ready behavioral signals."
-            )
-        if career >= 0.70:
-            return (
-                f"Strong career history in {industry} through {title}, giving this profile credible role alignment."
-            )
-        if semantic >= 0.75:
-            return (
-                f"High semantic alignment with the job description and a credible {title} background across {years:.1f} years."
-            )
-        return (
-            f"Candidate shows partial alignment for the {parsed_job.job_description.title} role, with {years:.1f} years of experience in {industry}."
+    def _lead_clause(self, candidate: Candidate, result: HybridScoreResult) -> str:
+        if result.career_score >= 0.80 and result.skill_score >= 0.76:
+            band = "excellent"
+        elif result.career_score >= 0.68 and result.skill_score >= 0.65:
+            band = "strong"
+        elif result.skill_score >= 0.68:
+            band = "technical"
+        else:
+            band = "partial"
+        template = self._pick(candidate.candidate_id, self.LEAD_TEMPLATES[band])
+        return template.format(
+            title=candidate.profile.current_title or "technical professional",
+            years=float(candidate.profile.years_of_experience or 0.0),
+            industry=candidate.profile.current_industry or "the relevant industry",
         )
 
-    def _skill_clause(self, candidate: Candidate, result: HybridScoreResult) -> str:
-        matched = self._dedupe_preserve_order(result.matched_items)
-        missing = self._dedupe_preserve_order(result.missing_items)
+    def _specialism_clause(self, candidate: Candidate, result: HybridScoreResult) -> str:
+        evidence = " ".join(result.matched_items + result.reasons + [
+            career.description or "" for career in candidate.career_history or []
+        ]).lower()
+        options = []
+        if "recommend" in evidence:
+            options.append("Recommendation-systems experience adds useful relevance for personalization work.")
+        if "retrieval" in evidence:
+            options.append("Retrieval-heavy experience strengthens the fit for search and candidate-matching systems.")
+        if re.search(r"\branking\b|learning to rank", evidence):
+            options.append("Ranking-systems evidence is directly useful for relevance-oriented ML work.")
+        if "production" in evidence or "deploy" in evidence:
+            options.append("Production deployment evidence reduces the gap between model development and operating ML systems.")
+        if "platform" in evidence:
+            options.append("ML or data-platform experience supports the systems side of the role.")
+        return self._pick(candidate.candidate_id, options, 7) if options else ""
 
-        matched_skills = [item for item in matched if self._looks_like_skill(item)]
-        missing_skills = [item for item in missing if self._looks_like_skill(item)]
-
+    def _skill_clause(self, result: HybridScoreResult, parsed_job: ParsedJob) -> str:
+        required = list(parsed_job.job_description.required_skills or [])
+        matched_keys = {self._normalize(item) for item in result.matched_items}
+        missing_keys = {self._normalize(item) for item in result.missing_items}
+        matched = [
+            skill for skill in required
+            if self._normalize(skill) in matched_keys and self._normalize(skill) not in missing_keys
+        ]
+        missing = [skill for skill in required if self._normalize(skill) in missing_keys]
         clauses = []
-        if matched_skills:
-            clauses.append(f"Important matches include {self._format_list(matched_skills[:3])}.")
-        elif result.skill_score >= 0.70:
-            clauses.append("The skill profile is broad enough to support the role requirements.")
-
-        if missing_skills:
-            clauses.append(f"Remaining skill gaps are {self._format_list(missing_skills[:3])}.")
-
-        return " ".join(clauses).strip()
+        if matched:
+            clauses.append(f"Core matches include {self._format_list(matched[:4])}.")
+        if missing:
+            clauses.append(f"Explicit gaps remain in {self._format_list(missing[:3])}.")
+        return " ".join(clauses)
 
     def _behavior_clause(self, candidate: Candidate, result: HybridScoreResult) -> str:
         signals = candidate.redrob_signals
-        clauses = []
-
+        facts = []
         if signals.open_to_work_flag:
-            clauses.append("Open to work, which makes outreach easier.")
-        else:
-            clauses.append("The candidate is not explicitly open to work.")
-
-        if signals.notice_period_days is not None:
-            if signals.notice_period_days <= 30:
-                clauses.append(f"Notice period is short at {signals.notice_period_days} days.")
-            elif signals.notice_period_days <= 90:
-                clauses.append(f"Notice period is moderate at {signals.notice_period_days} days.")
-            else:
-                clauses.append(f"Notice period is long at {signals.notice_period_days} days.")
-
+            facts.append("open to work")
         if signals.verified_email and signals.verified_phone:
-            clauses.append("Profile is verified by email and phone.")
-        elif signals.verified_email or signals.verified_phone:
-            verified_field = "email" if signals.verified_email else "phone"
-            clauses.append(f"Only {verified_field} verification is present.")
-        else:
-            clauses.append("The profile lacks direct verification signals.")
-
-        if signals.recruiter_response_rate is not None:
-            clauses.append(f"Recruiter response rate is {signals.recruiter_response_rate:.2f}.")
-
-        if signals.github_activity_score not in (None, -1):
-            clauses.append(f"GitHub activity score is {float(signals.github_activity_score):.2f}.")
-
-        if result.behavior_score >= 0.70:
-            clauses.append("Behavioral signals support a low-friction recruiting conversation.")
-        elif result.behavior_score <= 0.45:
-            clauses.append("Behavioral signals are weaker, so outreach confidence is lower.")
-
-        return " ".join(clauses).strip()
-
-    def _gap_clause(self, result: HybridScoreResult) -> str:
-        missing = self._dedupe_preserve_order(result.missing_items)
-        if not missing:
+            facts.append("email and phone verified")
+        if signals.recruiter_response_rate is not None and signals.recruiter_response_rate >= 0.70:
+            facts.append(f"a {signals.recruiter_response_rate:.0%} recruiter response rate")
+        if signals.notice_period_days is not None and signals.notice_period_days <= 30:
+            facts.append(f"a {signals.notice_period_days}-day notice period")
+        if signals.profile_completeness_score >= 0.85:
+            facts.append("a highly complete profile")
+        if not facts:
             return ""
+        templates = (
+            "As a tie-breaker, recruiter-readiness is supported by {facts}.",
+            "Recruiter-facing signals add confidence through {facts}.",
+            "For outreach, the profile also offers {facts}.",
+            "Secondary behavioral evidence is favorable: {facts}.",
+        )
+        return self._pick(candidate.candidate_id, templates, 13).format(facts=self._format_list(facts[:3]))
 
-        if result.skill_score < 0.60 and result.career_score < 0.60:
-            return "The main concern is missing key role-specific skills and only partial career alignment."
-        if result.skill_score < 0.60:
-            return "The candidate is still missing some key technical requirements from the job description."
-        if result.behavior_score < 0.50:
-            return "Recruiter-facing behavioral signals are not as strong as the technical fit."
-        return "There are still a few gaps to review before outreach."
+    def _gap_clause(self, result: HybridScoreResult, parsed_job: ParsedJob) -> str:
+        required_keys = {self._normalize(skill) for skill in parsed_job.job_description.required_skills or []}
+        gaps = [item for item in result.missing_items if self._normalize(item) in required_keys]
+        if not gaps:
+            return "No major required-skill gap is evident from the structured profile."
+        if result.career_score < 0.55:
+            return "The main reservation is that both direct career relevance and required-skill coverage need validation."
+        return "The remaining technical gaps should be verified during screening."
 
-    def _looks_like_skill(self, item: str) -> bool:
-        return any(char.isalpha() for char in item)
+    def _normalize(self, value: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "", value.lower())
 
     def _format_list(self, items: List[str]) -> str:
-        if not items:
-            return ""
         if len(items) == 1:
             return items[0]
         if len(items) == 2:
             return f"{items[0]} and {items[1]}"
         return f"{', '.join(items[:-1])}, and {items[-1]}"
-
-    def _dedupe_preserve_order(self, items: List[str]) -> List[str]:
-        seen = set()
-        ordered: List[str] = []
-        for item in items:
-            normalized = item.strip().lower()
-            if normalized and normalized not in seen:
-                seen.add(normalized)
-                ordered.append(item)
-        return ordered

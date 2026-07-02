@@ -61,8 +61,10 @@ class JobDescriptionParser:
             location=location,
             description=description,
             required_skills=required_skills,
+            preferred_skills=preferred_skills + nice_to_have_skills,
             required_experience_years=required_experience_years,
             responsibilities=responsibilities,
+            technologies=technologies,
             behaviors=[],  # Not extracted from JD
         )
 

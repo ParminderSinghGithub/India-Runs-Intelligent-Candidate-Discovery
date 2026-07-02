@@ -26,21 +26,22 @@ LOG_LEVEL: Final[int] = logging.INFO
 LOG_FORMAT: Final[str] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOG_DATE_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S"
 
-# Scoring weights (placeholders for now)
-CAREER_WEIGHT: Final[float] = 0.25
-SKILL_WEIGHT: Final[float] = 0.25
-BEHAVIOR_WEIGHT: Final[float] = 0.15
-SEMANTIC_WEIGHT: Final[float] = 0.20
-EDUCATION_WEIGHT: Final[float] = 0.10
+# Recruiter-oriented scoring weights.  Technical and career evidence drives the
+# result; platform behavior is deliberately restricted to a tie-breaking role.
+CAREER_WEIGHT: Final[float] = 0.38
+SKILL_WEIGHT: Final[float] = 0.34
+BEHAVIOR_WEIGHT: Final[float] = 0.05
+SEMANTIC_WEIGHT: Final[float] = 0.18
+EDUCATION_WEIGHT: Final[float] = 0.00
 CONSISTENCY_WEIGHT: Final[float] = 0.05
 CONSISTENCY_PENALTY: Final[float] = 0.1
 
 # Career scorer component weights
-CAREER_ROLE_RELEVANCE_WEIGHT: Final[float] = 0.30
+CAREER_ROLE_RELEVANCE_WEIGHT: Final[float] = 0.38
 CAREER_RESPONSIBILITIES_WEIGHT: Final[float] = 0.25
 CAREER_PROGRESSION_WEIGHT: Final[float] = 0.15
-CAREER_INDUSTRY_MATCH_WEIGHT: Final[float] = 0.15
-CAREER_RELEVANT_EXPERIENCE_WEIGHT: Final[float] = 0.15
+CAREER_INDUSTRY_MATCH_WEIGHT: Final[float] = 0.10
+CAREER_RELEVANT_EXPERIENCE_WEIGHT: Final[float] = 0.12
 
 # Validation thresholds
 MIN_CAREER_SCORE: Final[float] = 0.0
@@ -136,12 +137,12 @@ FAISS_INDEX_TYPE: Final[str] = "IndexFlatIP"  # Inner product for normalized emb
 FAISS_NPROBE: Final[int] = 10  # For IVF indices (not used with IndexFlatIP)
 
 # Skill scorer component weights
-SKILL_REQUIRED_MATCH_WEIGHT: Final[float] = 0.35
-SKILL_PREFERRED_MATCH_WEIGHT: Final[float] = 0.15
-SKILL_PROFICIENCY_WEIGHT: Final[float] = 0.20
+SKILL_REQUIRED_MATCH_WEIGHT: Final[float] = 0.45
+SKILL_PREFERRED_MATCH_WEIGHT: Final[float] = 0.08
+SKILL_PROFICIENCY_WEIGHT: Final[float] = 0.18
 SKILL_DURATION_WEIGHT: Final[float] = 0.10
-SKILL_ENDORSEMENT_WEIGHT: Final[float] = 0.10
-SKILL_TECHNOLOGY_COVERAGE_WEIGHT: Final[float] = 0.05
+SKILL_ENDORSEMENT_WEIGHT: Final[float] = 0.06
+SKILL_TECHNOLOGY_COVERAGE_WEIGHT: Final[float] = 0.08
 SKILL_DIVERSITY_WEIGHT: Final[float] = 0.05
 
 # Skill scorer normalization and confidence tuning
@@ -212,8 +213,8 @@ SKILL_PROFICIENCY_MAPPING: Final[dict] = {
 # Skill synonym mapping for normalization
 SKILL_SYNONYMS: Final[dict] = {
     # ML/AI
-    "machine learning": ["ml", "machinelearning"],
-    "deep learning": ["dl", "deeplearning"],
+    "machine learning": ["ml", "machinelearning", "machine learning engineering", "ml engineering"],
+    "deep learning": ["dl", "deeplearning", "neural networks", "neural network"],
     "artificial intelligence": ["ai"],
     "natural language processing": ["nlp"],
     "computer vision": ["cv"],

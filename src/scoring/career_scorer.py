@@ -28,9 +28,9 @@ class CareerScorer(BaseScorer):
 
     # Responsibility keywords to search for in descriptions
     RESPONSIBILITY_KEYWORDS = {
-        "building systems": ["building systems", "built systems", "system building"],
+        "building systems": ["building systems", "built systems", "system building", "build systems"],
         "designing pipelines": ["designing pipelines", "pipeline design", "data pipelines"],
-        "production": ["production", "production environment", "production systems"],
+        "production": ["production", "production environment", "production systems", "deploy", "deployment"],
         "recommendation": ["recommendation", "recommendation system", "recommender"],
         "retrieval": ["retrieval", "information retrieval", "retrieval systems"],
         "ranking": ["ranking", "rank", "learning to rank"],
@@ -60,6 +60,10 @@ class CareerScorer(BaseScorer):
         "principal": 6,
         "principal engineer": 6,
         "staff": 6,
+        "staff engineer": 6,
+        "architect": 6,
+        "distinguished": 7,
+        "fellow": 7,
         "manager": 5,
         "engineering manager": 5,
     }
@@ -80,6 +84,30 @@ class CareerScorer(BaseScorer):
         "it services",
         "data",
         "analytics",
+        "machine learning platform",
+        "recommendation",
+        "search",
+        "ads",
+        "marketplace",
+    }
+
+    ROLE_DOMAINS = {
+        "machine_learning": (
+            "machine learning", "ml engineer", "ai engineer", "applied scientist",
+            "data scientist", "deep learning", "computer vision", "nlp",
+        ),
+        "data": ("data engineer", "analytics engineer", "data platform"),
+        "backend": ("backend", "back end", "server side", "api engineer"),
+        "software": ("software engineer", "software developer", "full stack", "developer"),
+        "platform": ("platform engineer", "infrastructure", "distributed systems", "site reliability"),
+        "product": ("product manager", "program manager"),
+    }
+
+    DOMAIN_RELATEDNESS = {
+        ("machine_learning", "data"): 0.65,
+        ("machine_learning", "platform"): 0.50,
+        ("machine_learning", "software"): 0.35,
+        ("machine_learning", "backend"): 0.28,
     }
 
     def score(self, context: ScoringContext) -> ScoreResult:
@@ -178,47 +206,32 @@ class CareerScorer(BaseScorer):
             return 0.0, evidence
 
         # Normalize job title for comparison
-        job_title_normalized = self._normalize_title(job_title)
-        job_title_words = set(job_title_normalized.split())
-
         relevance_scores = []
-        matched_titles = []
+        ordered_careers = sorted(
+            candidate.career_history,
+            key=lambda c: (bool(c.is_current), c.start_date is not None, c.start_date),
+            reverse=True,
+        )
 
-        for career in candidate.career_history:
+        for index, career in enumerate(ordered_careers):
             if not career.title:
                 continue
 
-            title_normalized = self._normalize_title(career.title.lower())
-            title_words = set(title_normalized.split())
+            similarity = self._role_similarity(job_title, career.title)
+            recency_weight = 0.68 ** index
+            relevance_scores.append((similarity, recency_weight))
+            if similarity >= 0.45:
+                evidence.append({
+                    "type": "match",
+                    "item": career.title,
+                    "reason": f"Role '{career.title}' is relevant to {context.job_description.title} ({similarity:.2f})",
+                })
 
-            # Calculate overlap
-            overlap = len(job_title_words & title_words)
-            total_unique = len(job_title_words | title_words)
-
-            if total_unique > 0:
-                similarity = overlap / total_unique
-                relevance_scores.append(similarity)
-
-                if similarity > 0.3:
-                    matched_titles.append(career.title)
-                    evidence.append({
-                        "type": "match",
-                        "item": career.title,
-                        "reason": f"Title '{career.title}' has {similarity:.2f} similarity to job title",
-                    })
-
-        # Current title gets bonus weight
-        if candidate.career_history and candidate.career_history[0].is_current:
-            current_title = candidate.career_history[0].title
-            if current_title in matched_titles:
-                relevance_scores = [s * 1.2 for s in relevance_scores]
-
-        if relevance_scores:
-            avg_relevance = sum(relevance_scores) / len(relevance_scores)
-            # Normalize to 0-1 range
-            score = min(avg_relevance * 1.5, 1.0)
-        else:
-            score = 0.0
+        score = (
+            sum(value * weight for value, weight in relevance_scores)
+            / sum(weight for _, weight in relevance_scores)
+            if relevance_scores else 0.0
+        )
 
         return score, evidence
 
@@ -237,6 +250,17 @@ class CareerScorer(BaseScorer):
         if not candidate.career_history:
             return 0.0, evidence
 
+        target_text = " ".join(
+            [context.job_description.description or ""]
+            + list(context.job_description.responsibilities or [])
+        ).lower()
+        target_responsibilities = {
+            name for name, keywords in self.RESPONSIBILITY_KEYWORDS.items()
+            if any(keyword in target_text for keyword in keywords)
+        }
+        if not target_responsibilities:
+            return 0.5, evidence
+
         matched_responsibilities = set()
         total_descriptions = 0
 
@@ -247,7 +271,8 @@ class CareerScorer(BaseScorer):
             total_descriptions += 1
             description_lower = career.description.lower()
 
-            for resp_name, keywords in self.RESPONSIBILITY_KEYWORDS.items():
+            for resp_name in target_responsibilities:
+                keywords = self.RESPONSIBILITY_KEYWORDS[resp_name]
                 for keyword in keywords:
                     if keyword in description_lower:
                         matched_responsibilities.add(resp_name)
@@ -260,7 +285,7 @@ class CareerScorer(BaseScorer):
                         break
 
         # Score based on proportion of responsibilities found
-        total_responsibilities = len(self.RESPONSIBILITY_KEYWORDS)
+        total_responsibilities = len(target_responsibilities)
         if total_responsibilities > 0:
             score = len(matched_responsibilities) / total_responsibilities
         else:
@@ -287,11 +312,11 @@ class CareerScorer(BaseScorer):
         if not candidate.career_history or len(candidate.career_history) < 2:
             return 0.5, evidence  # Neutral score for insufficient data
 
-        # Sort careers by start date (most recent first)
+        # Evaluate transitions chronologically.  The previous implementation
+        # sorted newest-first, inadvertently treating normal promotions as drops.
         careers_sorted = sorted(
             candidate.career_history,
-            key=lambda c: c.start_date if c.start_date else None,
-            reverse=True,
+            key=lambda c: (c.start_date is not None, c.start_date),
         )
 
         progression_scores = []
@@ -324,15 +349,19 @@ class CareerScorer(BaseScorer):
                         })
                     else:
                         progression_scores.append(0.7)  # Neutral for similar levels
-                else:
-                    progression_scores.append(0.7)  # First role gets neutral score
-
                 previous_level = current_level
 
-        if progression_scores:
-            score = sum(progression_scores) / len(progression_scores)
-        else:
-            score = 0.5  # Neutral if no levels detected
+        current_career = next((c for c in candidate.career_history if c.is_current), candidate.career_history[-1])
+        current_level = self._get_career_level(current_career.title or "")
+        hierarchy_score = min(0.55 + (0.075 * current_level), 1.0) if current_level else 0.55
+        transition_score = sum(progression_scores) / len(progression_scores) if progression_scores else 0.65
+        score = (transition_score * 0.60) + (hierarchy_score * 0.40)
+        if current_level >= 4:
+            evidence.append({
+                "type": "match",
+                "item": current_career.title,
+                "reason": f"Current role demonstrates level-{current_level} seniority",
+            })
 
         return score, evidence
 
@@ -351,30 +380,37 @@ class CareerScorer(BaseScorer):
         if not candidate.career_history:
             return 0.0, evidence
 
-        matched_industries = set()
-        total_careers = 0
+        parsed_job = context.get_config("parsed_job")
+        targets = []
+        if parsed_job is not None:
+            targets = list(parsed_job.candidate_filters.required_industries or [])
+        target_text = " ".join(targets).lower()
+        industry_scores = []
 
         for career in candidate.career_history:
             if not career.industry:
                 continue
 
-            total_careers += 1
             industry_lower = career.industry.lower()
+            if any(target.lower() in industry_lower or industry_lower in target.lower() for target in targets):
+                relevance = 1.0
+            elif any(term in industry_lower for term in ("ai", "machine learning", "ml platform", "recommendation", "search")):
+                relevance = 0.95
+            elif any(term in industry_lower for term in ("ads", "marketplace", "fintech", "saas", "technology", "software", "data", "analytics")):
+                relevance = 0.75
+            elif any(term in industry_lower for term in self.RELEVANT_INDUSTRIES):
+                relevance = 0.65
+            else:
+                relevance = 0.30
+            industry_scores.append(relevance)
+            if relevance >= 0.65:
+                evidence.append({
+                    "type": "match",
+                    "item": career.industry,
+                    "reason": f"Relevant industry experience in {career.industry}",
+                })
 
-            for relevant_ind in self.RELEVANT_INDUSTRIES:
-                if relevant_ind in industry_lower:
-                    matched_industries.add(career.industry)
-                    evidence.append({
-                        "type": "match",
-                        "item": career.industry,
-                        "reason": f"Relevant industry experience in {career.industry}",
-                    })
-                    break
-
-        if total_careers > 0:
-            score = len(matched_industries) / total_careers
-        else:
-            score = 0.0
+        score = max(industry_scores) if industry_scores else (0.5 if not target_text else 0.0)
 
         return score, evidence
 
@@ -406,14 +442,8 @@ class CareerScorer(BaseScorer):
 
             total_months += career.duration_months
 
-            # Calculate relevance of this role
-            title_normalized = self._normalize_title(career.title.lower())
-            title_words = set(title_normalized.split())
-            overlap = len(job_title_words & title_words)
-            total_unique = len(job_title_words | title_words)
-
-            if total_unique > 0:
-                similarity = overlap / total_unique
+            similarity = self._role_similarity(job_title, career.title)
+            if similarity > 0:
                 # Weight duration by relevance
                 if similarity > 0.3:
                     weighted_duration = career.duration_months * similarity
@@ -478,6 +508,37 @@ class CareerScorer(BaseScorer):
         title = " ".join(title.split())
         return title
 
+    def _role_domain(self, title: str) -> str:
+        normalized = self._normalize_title(title.lower())
+        for domain, phrases in self.ROLE_DOMAINS.items():
+            if any(phrase in normalized for phrase in phrases):
+                return domain
+        return "other"
+
+    def _role_similarity(self, target_title: str, candidate_title: str) -> float:
+        target = self._normalize_title(target_title.lower())
+        candidate = self._normalize_title(candidate_title.lower())
+        if not target or not candidate:
+            return 0.0
+        if target == candidate or target in candidate or candidate in target:
+            return 1.0
+
+        target_domain = self._role_domain(target)
+        candidate_domain = self._role_domain(candidate)
+        if target_domain == candidate_domain and target_domain != "other":
+            domain_score = 0.88
+        else:
+            domain_score = self.DOMAIN_RELATEDNESS.get(
+                (target_domain, candidate_domain),
+                self.DOMAIN_RELATEDNESS.get((candidate_domain, target_domain), 0.12),
+            )
+
+        generic = {"engineer", "engineering", "developer", "manager", "lead", "specialist"}
+        target_words = set(target.split()) - generic
+        candidate_words = set(candidate.split()) - generic
+        lexical = len(target_words & candidate_words) / max(len(target_words | candidate_words), 1)
+        return min(max(domain_score, lexical), 1.0)
+
     def _get_career_level(self, title: str) -> int:
         """Get career level from title.
 
@@ -488,7 +549,8 @@ class CareerScorer(BaseScorer):
             Career level (1-6), or 0 if not recognized.
         """
         title_lower = title.lower()
-        for level_name, level_value in self.CAREER_LEVELS.items():
-            if level_name in title_lower:
-                return level_value
-        return 0
+        matches = [
+            level_value for level_name, level_value in self.CAREER_LEVELS.items()
+            if re.search(rf"\b{re.escape(level_name)}\b", title_lower)
+        ]
+        return max(matches, default=0)

@@ -51,6 +51,15 @@ class SkillScorer(BaseScorer):
     All matching is deterministic with synonym support.
     """
 
+    RELATED_SKILL_GROUPS = (
+        ({"machinelearning", "deeplearning", "artificialintelligence"}, 0.68),
+        ({"deeplearning", "pytorch", "tensorflow", "keras"}, 0.65),
+        ({"sql", "postgresql", "mysql", "bigquery", "snowflake", "redshift"}, 0.65),
+        ({"aws", "gcp", "azure", "cloud"}, 0.55),
+        ({"docker", "kubernetes", "cicd", "terraform"}, 0.50),
+        ({"spark", "hadoop", "kafka", "dataengineering"}, 0.50),
+    )
+
     def __init__(self):
         """Initialize the skill scorer."""
         self._build_reverse_synonym_map()
@@ -178,27 +187,30 @@ class SkillScorer(BaseScorer):
         technologies = job_description.technologies or []
 
         # Get candidate skills
-        candidate_skills = candidate.skills or []
+        candidate_skills = list(candidate.skills or [])
+        inferred_skills = self._infer_role_skills(candidate, required_skills + preferred_skills + technologies)
+        candidate_skills.extend(inferred_skills)
 
         # Normalize all skills
         required_normalized = self._normalize_skill_list(required_skills)
         preferred_normalized = self._normalize_skill_list(preferred_skills)
         technology_normalized = self._normalize_skill_list(technologies)
         candidate_skill_map = self._build_candidate_skill_map(candidate_skills)
+        inferred_keys = {self._get_canonical_skill(skill.name) for skill in inferred_skills}
 
         # Calculate component scores
         required_score, required_matched, required_missing = self._score_required_match(
-            required_normalized, candidate_skill_map
+            required_normalized, candidate_skill_map, inferred_keys
         )
 
         preferred_score, preferred_matched, preferred_missing = self._score_preferred_match(
-            preferred_normalized, candidate_skill_map
+            preferred_normalized, candidate_skill_map, inferred_keys
         )
 
         proficiency_score = self._score_proficiency(candidate_skill_map, required_normalized)
         duration_score = self._score_duration(candidate_skill_map, required_normalized)
         endorsement_score = self._score_endorsements(candidate_skill_map, required_normalized)
-        tech_coverage_score = self._score_technology_coverage(technology_normalized, candidate_skill_map)
+        tech_coverage_score = self._score_technology_coverage(technology_normalized, candidate_skill_map, inferred_keys)
         diversity_score = self._score_diversity(candidate_skill_map)
 
         # Calculate weighted final score
@@ -258,8 +270,60 @@ class SkillScorer(BaseScorer):
                 "component": "skill",
                 "partial_scores": partial_scores,
                 "evidence_count": len(reasons),
+                "inferred_role_skills": [skill.name for skill in inferred_skills],
             },
         )
+
+    def _infer_role_skills(self, candidate: object, target_skills: List[str]) -> List[Skill]:
+        """Infer conservative, lower-confidence skill evidence from career text."""
+        career_text = " ".join(
+            f"{career.title or ''} {career.description or ''}"
+            for career in candidate.career_history or []
+        ).lower()
+        normalized_text = self._normalize_skill(career_text)
+        inferred: List[Skill] = []
+        explicit = {self._get_canonical_skill(skill.name) for skill in candidate.skills or [] if skill.name}
+
+        for target in target_skills:
+            canonical = self._get_canonical_skill(target)
+            if canonical in explicit or len(canonical) < 3:
+                continue
+            aliases = [canonical] + [
+                self._normalize_skill(alias)
+                for root, values in SKILL_SYNONYMS.items()
+                if self._get_canonical_skill(root) == canonical
+                for alias in values
+                if len(self._normalize_skill(alias)) >= 3
+            ]
+            if any(alias in normalized_text for alias in aliases):
+                durations = [
+                    career.duration_months or 0 for career in candidate.career_history or []
+                    if any(alias in self._normalize_skill(f"{career.title or ''} {career.description or ''}") for alias in aliases)
+                ]
+                inferred.append(Skill(
+                    name=target,
+                    proficiency="intermediate",
+                    endorsements=0,
+                    duration_months=min(max(durations, default=0), SKILL_DURATION_MAX_MONTHS),
+                ))
+        return inferred
+
+    def _match_strength(
+        self,
+        required: str,
+        candidate_skill_map: Dict[str, Skill],
+        inferred_keys: set,
+    ) -> Tuple[float, str]:
+        if required in candidate_skill_map:
+            return (0.80 if required in inferred_keys else 1.0), required
+        best_strength, best_key = 0.0, ""
+        for candidate_key in candidate_skill_map:
+            for group, strength in self.RELATED_SKILL_GROUPS:
+                if required in group and candidate_key in group and required != candidate_key:
+                    adjusted = strength * (0.85 if candidate_key in inferred_keys else 1.0)
+                    if adjusted > best_strength:
+                        best_strength, best_key = adjusted, candidate_key
+        return best_strength, best_key
 
     def _build_candidate_skill_map(self, skills: List[Skill]) -> Dict[str, Skill]:
         """Build normalized skill map from candidate skills.
@@ -283,6 +347,7 @@ class SkillScorer(BaseScorer):
         self,
         required_skills: List[str],
         candidate_skill_map: Dict[str, Skill],
+        inferred_keys: set = frozenset(),
     ) -> Tuple[float, List[str], List[str]]:
         """Score required skill matching.
 
@@ -298,20 +363,24 @@ class SkillScorer(BaseScorer):
 
         matched = []
         missing = []
+        strengths = []
 
         for skill in required_skills:
-            if skill in candidate_skill_map:
+            strength, _ = self._match_strength(skill, candidate_skill_map, inferred_keys)
+            strengths.append(strength)
+            if strength >= 0.50:
                 matched.append(skill)
             else:
                 missing.append(skill)
 
-        score = len(matched) / len(required_skills) if required_skills else 1.0
+        score = sum(strengths) / len(required_skills) if required_skills else 1.0
         return score, matched, missing
 
     def _score_preferred_match(
         self,
         preferred_skills: List[str],
         candidate_skill_map: Dict[str, Skill],
+        inferred_keys: set = frozenset(),
     ) -> Tuple[float, List[str], List[str]]:
         """Score preferred skill matching.
 
@@ -327,14 +396,17 @@ class SkillScorer(BaseScorer):
 
         matched = []
         missing = []
+        strengths = []
 
         for skill in preferred_skills:
-            if skill in candidate_skill_map:
+            strength, _ = self._match_strength(skill, candidate_skill_map, inferred_keys)
+            strengths.append(strength)
+            if strength >= 0.50:
                 matched.append(skill)
             else:
                 missing.append(skill)
 
-        score = len(matched) / len(preferred_skills) if preferred_skills else 1.0
+        score = sum(strengths) / len(preferred_skills) if preferred_skills else 1.0
         return score, matched, missing
 
     def _score_proficiency(
@@ -432,6 +504,7 @@ class SkillScorer(BaseScorer):
         self,
         technologies: List[str],
         candidate_skill_map: Dict[str, Skill],
+        inferred_keys: set = frozenset(),
     ) -> float:
         """Score technology coverage.
 
@@ -446,12 +519,15 @@ class SkillScorer(BaseScorer):
             return 1.0
 
         matched = 0
+        match_strength = 0.0
         for tech in technologies:
             canonical = self._get_canonical_skill(tech)
-            if canonical in candidate_skill_map:
+            strength, _ = self._match_strength(canonical, candidate_skill_map, inferred_keys)
+            match_strength += strength
+            if strength >= 0.50:
                 matched += 1
 
-        coverage = matched / len(technologies) if technologies else 1.0
+        coverage = match_strength / len(technologies) if technologies else 1.0
 
         # Reward broader overlap with a capped bonus based on the number of matched technologies.
         breadth_bonus = min(matched / float(max(len(technologies), 1)), 1.0)

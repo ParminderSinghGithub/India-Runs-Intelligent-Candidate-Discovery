@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from src.config import (
@@ -58,7 +59,7 @@ class HybridRanker:
         self.skill_scorer = skill_scorer or SkillScorer()
         self.behavior_scorer = behavior_scorer or BehaviorScorer()
         self.education_scorer = education_scorer
-        self.consistency_scorer = consistency_scorer
+        self.consistency_scorer = consistency_scorer or ConsistencyScorer()
         self.last_retrieved_candidates: List[Dict[str, Any]] = []
 
     def rank(self, context: ScoringContext) -> List[Dict[str, Any]]:
@@ -134,7 +135,7 @@ class HybridRanker:
             "consistency": consistency_result.score,
         }
 
-        weighted_final_score = self._clamp(
+        raw_weighted_score = self._clamp(
             semantic_score * SEMANTIC_WEIGHT
             + career_result.score * CAREER_WEIGHT
             + skill_result.score * SKILL_WEIGHT
@@ -143,6 +144,11 @@ class HybridRanker:
             + consistency_result.score * CONSISTENCY_WEIGHT,
             0.0,
             1.0,
+        )
+        weighted_final_score, calibration_adjustment = self._calibrate_score(
+            raw_weighted_score,
+            career_result.score,
+            skill_result.score,
         )
 
         confidence = self._aggregate_confidence(
@@ -170,6 +176,8 @@ class HybridRanker:
             + list(education_result.missing_items)
             + list(consistency_result.missing_items)
         )
+        matched_keys = {self._evidence_key(item) for item in matched_items}
+        missing_items = [item for item in missing_items if self._evidence_key(item) not in matched_keys]
         reasons = self._dedupe_preserve_order(
             list(career_result.reasons)
             + list(skill_result.reasons)
@@ -184,6 +192,8 @@ class HybridRanker:
             "retrieval_rank": retrieval_result.get("rank"),
             "retrieval_similarity": semantic_score,
             "component_scores": component_scores,
+            "raw_weighted_score": raw_weighted_score,
+            "calibration_adjustment": calibration_adjustment,
             "component_confidences": {
                 "semantic": semantic_score,
                 "career": career_result.confidence,
@@ -287,11 +297,13 @@ class HybridRanker:
     def _is_available(self, result: ScoreResult) -> bool:
         return result.get_metadata("available", True) is not False
 
-    def _sort_key(self, result: HybridScoreResult) -> Tuple[float, float, float, str]:
+    def _sort_key(self, result: HybridScoreResult) -> Tuple[float, float, float, float, float, str]:
         return (
             -result.weighted_final_score,
-            -result.semantic_score,
+            -result.career_score,
             -result.skill_score,
+            -result.consistency_score,
+            -result.behavior_score,
             result.candidate_id,
         )
 
@@ -303,6 +315,24 @@ class HybridRanker:
                 seen.add(item)
                 deduped.append(item)
         return deduped
+
+    def _calibrate_score(self, raw_score: float, career_score: float, skill_score: float) -> Tuple[float, float]:
+        """Reward corroborated recruiter evidence and separate weak technical fits.
+
+        The adjustment depends on the weaker of career and skill evidence, so a
+        high semantic score or one excellent component cannot trigger it alone.
+        """
+        joint_technical_evidence = min(career_score, skill_score)
+        if joint_technical_evidence >= 0.60:
+            adjustment = min(0.10, 0.02 + ((joint_technical_evidence - 0.60) * 0.45))
+        elif joint_technical_evidence < 0.40:
+            adjustment = -min(0.08, (0.40 - joint_technical_evidence) * 0.35)
+        else:
+            adjustment = 0.0
+        return self._clamp(raw_score + adjustment, 0.0, 1.0), adjustment
+
+    def _evidence_key(self, item: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "", item.lower())
 
     def _clamp(self, value: float, minimum: float, maximum: float) -> float:
         return max(minimum, min(value, maximum))

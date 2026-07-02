@@ -280,9 +280,10 @@ class BehaviorScorer(BaseScorer):
         else:
             evidence.append(self._evidence("missing", "No recent applications", "No recent applications submitted"))
 
-        github_available = self._is_missing_optional(signals.github_activity_score)
-        if github_available:
-            github_score = self._clamp_unit(self._to_float(signals.github_activity_score, 0.0))
+        github_missing = self._is_missing_optional(signals.github_activity_score)
+        if not github_missing:
+            github_raw = self._to_float(signals.github_activity_score, 0.0)
+            github_score = self._clamp_unit(github_raw / 100.0 if github_raw > 1.0 else github_raw)
             github_weight = BEHAVIOR_ACTIVITY_GITHUB_WEIGHT
             available += 1
             if github_score >= BEHAVIOR_GITHUB_ACTIVITY_THRESHOLD:
