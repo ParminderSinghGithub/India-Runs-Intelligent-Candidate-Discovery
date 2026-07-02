@@ -106,6 +106,7 @@ class PipelineValidator:
     # Required output filenames produced by a successful ranking run
     OUTPUT_FILES = [
         "submission.csv",
+        "submission.xlsx",
         "ranking.json",
         "pipeline_report.json",
     ]
@@ -330,6 +331,37 @@ class PipelineValidator:
                 checks.append(
                     ValidationCheck(
                         name="submission_csv_row_count",
+                        passed=False,
+                        message=str(exc),
+                    )
+                )
+
+        # Validate submission.xlsx row count
+        xlsx_path = OUTPUTS_DIR / "submission.xlsx"
+        if xlsx_path.exists():
+            try:
+                import openpyxl
+
+                wb = openpyxl.load_workbook(xlsx_path, read_only=True)
+                ws = wb.active
+                # In read_only mode, we can count rows. Header row + 100 candidate rows = 101 max_row or manual iteration
+                row_count = 0
+                for row in ws.iter_rows(values_only=True):
+                    row_count += 1
+                data_rows = row_count - 1 if row_count > 0 else 0
+                wb.close()
+
+                checks.append(
+                    ValidationCheck(
+                        name="submission_xlsx_row_count",
+                        passed=data_rows == 100,
+                        message=f"{data_rows} data rows (expected 100)",
+                    )
+                )
+            except Exception as exc:
+                checks.append(
+                    ValidationCheck(
+                        name="submission_xlsx_row_count",
                         passed=False,
                         message=str(exc),
                     )

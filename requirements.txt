@@ -1,8 +1,23 @@
-# India Runs Data & AI Challenge - Dependencies
+# India Runs Data & AI Challenge — Dependencies
+# Install: pip install -r requirements.txt
 
-# Core dependencies
+# ── Core ML / embedding ──────────────────────────────────────────────────────
 numpy>=1.24.0
 torch>=2.0.0
 sentence-transformers>=2.2.0
-tqdm>=4.65.0
 faiss-cpu>=1.7.4
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+tqdm>=4.65.0
+
+# ── Submission & export ──────────────────────────────────────────────────────
+openpyxl>=3.1.0          # XLSX export
+
+# ── Streamlit demo app ───────────────────────────────────────────────────────
+streamlit>=1.35.0
+plotly>=5.20.0
+pandas>=1.4.0
+torchvision>=0.15.0       # Suppresses Streamlit watcher warnings
+
+# ── Optional: system metrics in pipeline report ──────────────────────────────
+psutil>=5.9.0

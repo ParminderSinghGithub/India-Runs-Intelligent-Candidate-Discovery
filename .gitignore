@@ -1,9 +1,51 @@
-[[]PUB[]] India_runs_data_and_ai_challenge
+# ── Challenge dataset (large, not committed) ─────────────────────────────────
+[[]PUB[]] India_runs_data_and_ai_challenge/
 [[]PUB[]] India_runs_data_and_ai_challenge.zip
-redrob-ai-india_runs
-redrob-ai-india_runs.zip
-.venv
-__pycache__
-artifacts
-india_runs-codebase.zip
+
+# ── Pre-built binary artifacts (large, not committed) ────────────────────────
+artifacts/
 redrob_artifacts.zip
+
+# ── Generated outputs (reproducible, not committed) ──────────────────────────
+outputs/
+
+# ── Source zips / snapshots ──────────────────────────────────────────────────
+redrob-ai-india_runs/
+redrob-ai-india_runs.zip
+india_runs-codebase.zip
+
+# ── Python environment ───────────────────────────────────────────────────────
+.venv/
+
+# ── Python bytecode ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Jupyter / notebook artifacts ─────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS / editor artifacts ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# ── Build / distribution ──────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Streamlit ─────────────────────────────────────────────────────────────────
+.streamlit/

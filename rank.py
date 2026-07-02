@@ -1,4 +1,4 @@
-"""Official ranking entry point for Stage 3 submission generation.
+"""Official ranking entry point for Track 1 submission generation.
 
 Usage::
 
@@ -24,7 +24,7 @@ from src.parser.candidate_parser import CandidateParser
 from src.parser.job_description_parser import JobDescriptionParser
 from src.retrieval.retriever import Retriever
 from src.scoring.hybrid_ranker import HybridRanker
-from src.submission import CandidateResolver, SubmissionGenerator, SubmissionValidator
+from src.submission import CandidateResolver, SubmissionGenerator, SubmissionValidator, XlsxExporter
 from src.utils import setup_logging, stage_log
 
 logger = logging.getLogger(__name__)
@@ -121,6 +121,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="Output CSV path",
     )
     parser.add_argument(
+        "--output-xlsx",
+        default=str(PROJECT_ROOT / "outputs" / "submission.xlsx"),
+        help="Output XLSX path",
+    )
+    parser.add_argument(
         "--ranking-json",
         default=str(PROJECT_ROOT / "outputs" / "ranking.json"),
         help="Ranking JSON path",
@@ -147,6 +152,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     job_path = Path(args.job)
     candidates_path = Path(args.candidates)
     output_path = Path(args.output)
+    output_xlsx_path = Path(args.output_xlsx)
     ranking_json_path = Path(args.ranking_json)
     report_path = Path(args.report)
     metadata_path = Path(args.metadata)
@@ -210,7 +216,11 @@ def main(argv: Optional[list[str]] = None) -> int:
             configuration={"top_k": args.top_k},
             ai_tools_used=["GitHub Copilot"],
         )
-        validation_latency = time.perf_counter() - validation_start
+        xlsx_start = time.perf_counter()
+        xlsx_exporter = XlsxExporter()
+        xlsx_exporter.export(result["rows"], output_xlsx_path)
+        xlsx_latency = time.perf_counter() - xlsx_start
+        validation_latency = (time.perf_counter() - validation_start) - xlsx_latency
 
     total_latency = time.perf_counter() - pipeline_start
 
@@ -224,6 +234,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     )
     print("  Timing:          PASS (<300 sec)")
     print(f"  Submission CSV:  {output_path}")
+    print(f"  Submission XLSX: {output_xlsx_path}")
     print(f"  Ranking JSON:    {ranking_json_path}")
     print(f"  Pipeline report: {report_path}")
     print(f"  Metadata YAML:   {metadata_path}")

@@ -1,10 +1,50 @@
-# Redrob AI — India Runs Candidate Ranking System
+# RedrobAI — India Runs Intelligent Candidate Discovery System
 
-> **India Runs Data &amp; AI Challenge · Stage 3 — Ranking Track**
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/demo-Streamlit-FF4B4B?logo=streamlit)](./app.py)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Track 1](https://img.shields.io/badge/India%20Runs-Track%201-6366f1)](https://indiaruns.redrob.ai)
+[![FAISS](https://img.shields.io/badge/index-FAISS%20IndexFlatIP-22d3ee)](https://faiss.ai)
 
-A fully deterministic, retrieval-augmented candidate ranking pipeline that
+> **India Runs Data &amp; AI Challenge · Track 1 — Ranking Track**
+
+A fully deterministic, retrieval-augmented intelligent candidate discovery pipeline that
 scores 100+ shortlisted candidates against a job description and produces a
 validated submission CSV with recruiter-ready explanations.
+
+---
+
+## Demo
+
+> **Run locally:** `streamlit run app.py`
+
+<!-- Demo PNG: screenshot/mockup of the dashboard app -->
+![RedrobAI Intelligent Candidate Discovery Demo](docs/demo_placeholder.png)
+
+The Streamlit app provides:
+- Upload a custom job description JSON **or** use the bundled challenge JD
+- One-click **Generate Top Candidates** (uses cached FAISS — no rebuild)
+- Sortable ranked table with scores, titles, experience, industry, reasoning
+- Plotly charts: score distribution, component averages, top industries, experience spread
+- Per-candidate score breakdown with matched/missing evidence tags
+- Download: `submission.csv` · `submission.xlsx` · `ranking.json` · `pipeline_report.json`
+
+---
+
+## Results
+
+| Metric | Value |
+|---|---|
+| Candidates in index | 100,000 |
+| Candidates ranked | 100 |
+| Top score | 0.8759 |
+| Score range | 0.4266 – 0.8759 |
+| Retrieval time | 1.8 s |
+| Re-ranking time | 18 s |
+| Total runtime | **~20 s** |
+| Unique explanations | 100 / 100 |
+| Submission validation | **PASS** (23/23 checks) |
+| Pipeline validator | **PASS** (23/23 checks) |
 
 ---
 
@@ -16,14 +56,17 @@ validated submission CSV with recruiter-ready explanations.
 4. [Offline Indexing (one-time setup)](#offline-indexing-one-time-setup)
 5. [Running the Ranking](#running-the-ranking)
 6. [Generating the Submission](#generating-the-submission)
-7. [Artifacts](#artifacts)
-8. [Performance](#performance)
-9. [Limitations](#limitations)
-10. [Future Work](#future-work)
+7. [Streamlit Demo](#demo)
+8. [Artifacts](#artifacts)
+9. [Performance](#performance)
+10. [Limitations](#limitations)
+11. [Future Work](#future-work)
 
 ---
 
 ## Architecture
+
+> See full Mermaid diagrams in [`docs/architecture.md`](docs/architecture.md) and [`docs/pipeline_flow.md`](docs/pipeline_flow.md).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -338,3 +381,9 @@ print(report)
 - **GPU acceleration:** Switch to `faiss-gpu` for embedding generation and index search on CUDA hardware.
 - **Active learning on feedback:** Use recruiter accept/reject signals to fine-tune scorer weights.
 - **Cross-lingual support:** Add multilingual embeddings (e.g., `multilingual-e5-base`) for non-English profiles.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
