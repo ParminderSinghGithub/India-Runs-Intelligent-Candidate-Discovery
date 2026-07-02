@@ -25,6 +25,7 @@ from src.parser.job_description_parser import JobDescriptionParser
 from src.retrieval.retriever import Retriever
 from src.scoring.hybrid_ranker import HybridRanker
 from src.submission import CandidateResolver, SubmissionGenerator, SubmissionValidator, XlsxExporter
+from src.deployment import ArtifactManager
 from src.utils import setup_logging, stage_log
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,9 @@ _REBUILD_HINT = (
 
 
 def _default_candidates_path() -> Path:
+    root_path = PROJECT_ROOT / "candidates.jsonl"
+    if root_path.exists():
+        return root_path
     return (
         PROJECT_ROOT
         / "[PUB] India_runs_data_and_ai_challenge"
@@ -161,6 +165,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     pipeline_start = time.perf_counter()
 
     # Pre-flight checks — fail fast with clear guidance
+    ArtifactManager.ensure_artifacts(streamlit_ui=False)
     _check_artifacts()
     _check_candidates(candidates_path)
 

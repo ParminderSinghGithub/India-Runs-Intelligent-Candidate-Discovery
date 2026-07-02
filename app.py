@@ -36,6 +36,7 @@ from src.parser.job_description_parser import JobDescriptionParser
 from src.retrieval.retriever import Retriever
 from src.scoring.hybrid_ranker import HybridRanker
 from src.submission import CandidateResolver, SubmissionGenerator
+from src.deployment import ArtifactManager
 from src.utils import setup_logging
 
 setup_logging()
@@ -46,13 +47,20 @@ REQUIRED_ARTIFACTS = [
     FAISS_DIR / "candidate_lookup.pkl",
     FAISS_DIR / "embedding_metadata.pkl",
 ]
-CANDIDATES_JSONL = (
-    PROJECT_ROOT
-    / "[PUB] India_runs_data_and_ai_challenge"
-    / "[PUB] India_runs_data_and_ai_challenge"
-    / "India_runs_data_and_ai_challenge"
-    / "candidates.jsonl"
-)
+
+def _find_candidates_jsonl() -> Path:
+    root_path = PROJECT_ROOT / "candidates.jsonl"
+    if root_path.exists():
+        return root_path
+    return (
+        PROJECT_ROOT
+        / "[PUB] India_runs_data_and_ai_challenge"
+        / "[PUB] India_runs_data_and_ai_challenge"
+        / "India_runs_data_and_ai_challenge"
+        / "candidates.jsonl"
+    )
+
+CANDIDATES_JSONL = _find_candidates_jsonl()
 
 COMPONENT_COLORS = {
     "Career":      "#6366f1",
@@ -258,15 +266,7 @@ st.markdown(
 )
 
 # ── artifact guard ────────────────────────────────────────────────────────────
-if not artifacts_present():
-    st.error(
-        "**FAISS artifacts not found.**\n\n"
-        "Run the offline build once to create them:\n"
-        "```\npython run_pipeline.py --rebuild-index\n```\n\n"
-        "This is a one-time step (~15–40 min on CPU). "
-        "After that, rankings complete in ~20 seconds."
-    )
-    st.stop()
+ArtifactManager.ensure_artifacts(streamlit_ui=True)
 
 # ── job description input ─────────────────────────────────────────────────────
 st.markdown("### Job Description")
@@ -312,8 +312,9 @@ if run_clicked:
 
     if not CANDIDATES_JSONL.exists():
         st.error(
-            f"Candidates JSONL not found:\n`{CANDIDATES_JSONL}`\n\n"
-            "Ensure the challenge dataset is extracted to the project root."
+            "⚠️ **Candidate profile database (candidates.jsonl) not found.**\n\n"
+            "The candidate records are required to perform re-ranking. "
+            "Please ensure that the dataset file is uploaded to Hugging Face Spaces or placed in the project root."
         )
         st.stop()
 

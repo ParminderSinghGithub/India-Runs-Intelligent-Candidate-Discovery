@@ -298,3 +298,12 @@ SKILL_SYNONYMS: Final[dict] = {
     "linux": [],
     "unix": [],
 }
+
+# ---------------------------------------------------------------------------
+# Hugging Face deployment configuration
+# ---------------------------------------------------------------------------
+HF_DATASET_REPO: Final[str] = "ParminderzHuggingFace/india-runs-faiss-artifacts"
+HF_DATASET_REVISION: Final[str] = "main"
+HF_ARTIFACT_DIR: Final[Path] = ARTIFACTS_DIR / "faiss"
+HF_DOWNLOAD_TIMEOUT: Final[int] = 300
+HF_FORCE_DOWNLOAD: Final[bool] = False

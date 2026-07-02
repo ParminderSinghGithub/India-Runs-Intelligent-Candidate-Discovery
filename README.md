@@ -235,6 +235,23 @@ What this does:
 
 ---
 
+## Deployment
+
+### Automated Artifact Delivery
+
+To keep the GitHub repository clean and lightweight, the large pre-computed search index files (totaling ~325 MB) are stored in the Hugging Face Dataset registry rather than being checked into Git history:
+- **Registry**: [ParminderzHuggingFace/india-runs-faiss-artifacts](https://huggingface.co/datasets/ParminderzHuggingFace/india-runs-faiss-artifacts)
+- **Artifacts**: `faiss.index`, `candidate_lookup.pkl`, `embedding_metadata.pkl`
+
+On the first launch of `rank.py` or the Streamlit `app.py`, the system's `ArtifactManager` will automatically:
+1. Detect any missing files in `artifacts/faiss/`.
+2. Download only the missing files directly from Hugging Face.
+3. Skip already existing files to save startup time.
+
+No manual artifact copying, downloading, or extraction is needed!
+
+---
+
 ## Running the Ranking
 
 Ensure you are using the project virtual environment:

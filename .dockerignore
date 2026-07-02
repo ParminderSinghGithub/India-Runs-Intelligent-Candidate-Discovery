@@ -1,0 +1,25 @@
+# Exclude python virtual environment and git files
+.venv/
+.git/
+.gitignore
+.dockerignore
+LICENSE
+README.md
+docs/
+tests/
+outputs/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+*.ipynb
+
+# Do NOT exclude artifacts/faiss/
+# But exclude raw datasets and large source archives
+[PUB] India_runs_data_and_ai_challenge/
+[PUB] India_runs_data_and_ai_challenge.zip
+redrob-ai-india_runs/
+redrob-ai-india_runs.zip
+india_runs-codebase.zip
+redrob_artifacts.zip
