@@ -26,7 +26,6 @@ __pycache__/
 
 # ── Jupyter / notebook artifacts ─────────────────────────────────────────────
 .ipynb_checkpoints/
-*.ipynb
 
 # ── OS / editor artifacts ─────────────────────────────────────────────────────
 .DS_Store
