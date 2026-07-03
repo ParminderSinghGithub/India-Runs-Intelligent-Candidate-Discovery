@@ -1,3 +1,12 @@
+---
+title: Redrob AI Intelligent Candidate Discovery
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
 # RedrobAI — India Runs Intelligent Candidate Discovery System
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)

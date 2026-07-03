@@ -1,35 +1,40 @@
-# Use python 3.11 lightweight slim image
+# Use Python 3.11 lightweight image
 FROM python:3.11-slim
 
-# Install system dependencies required by FAISS and other libraries (e.g. libgomp for openmp support)
+# Install system dependencies required by FAISS
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up a non-root user with UID 1000 (Hugging Face Spaces default)
+# Create a non-root user (recommended for Hugging Face Spaces)
 RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
 
-# Set the working directory in the user's home
+USER user
+
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    PYTHONUNBUFFERED=1
+
 WORKDIR $HOME/app
 
-# Copy requirements and install dependencies
-COPY --chown=user requirements.txt .
+# Install Python dependencies
+COPY --chown=user:user requirements.txt .
+
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Copy all application files (excluding those in .dockerignore)
-COPY --chown=user . .
+# Copy application
+COPY --chown=user:user . .
 
-# Expose the port Streamlit will listen on (Hugging Face default is 7860)
+# Hugging Face Docker Spaces default port
 EXPOSE 7860
 
-# Streamlit environment configurations to disable telemetry, set port, and disable file watcher
+# Streamlit configuration
 ENV STREAMLIT_SERVER_PORT=7860 \
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
     STREAMLIT_SERVER_HEADLESS=true \
     STREAMLIT_SERVER_ENABLE_CORS=false \
-    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
+    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
-# Run the Streamlit app
-CMD ["streamlit", "run", "app.py"]
+# Launch Streamlit
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
