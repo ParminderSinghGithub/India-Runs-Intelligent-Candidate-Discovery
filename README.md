@@ -73,15 +73,16 @@ FAISS semantic retrieval → Hybrid scoring → Deterministic explanation genera
 
 1. [Architecture](#architecture)
 2. [Repository Layout](#repository-layout)
-3. [Pipeline Overview](#pipeline-overview)
-4. [Offline Indexing (one-time setup)](#offline-indexing-one-time-setup)
-5. [Running the Ranking](#running-the-ranking)
-6. [Generating the Submission](#generating-the-submission)
-7. [Streamlit Demo](#demo)
-8. [Artifacts](#artifacts)
-9. [Performance](#performance)
-10. [Limitations](#limitations)
-11. [Future Work](#future-work)
+3. [Notebooks](#notebooks)
+4. [Pipeline Overview](#pipeline-overview)
+5. [Offline Indexing (one-time setup)](#offline-indexing-one-time-setup)
+6. [Running the Ranking](#running-the-ranking)
+7. [Generating the Submission](#generating-the-submission)
+8. [Streamlit Demo](#demo)
+9. [Artifacts](#artifacts)
+10. [Performance](#performance)
+11. [Limitations](#limitations)
+12. [Future Work](#future-work)
 
 ---
 
@@ -193,9 +194,31 @@ India-Runs/
 │   ├── ranking.json
 │   └── pipeline_report.json
 │
+├── notebooks/
+│   ├── notebook-1-dataset-forensics-problem-understand.ipynb
+│   └── notebook-2-offline-index-builder.ipynb
+│
 └── tests/
     └── test_ranking_intelligence.py
 ```
+
+---
+
+## Notebooks
+
+The complete experimentation workflow is available on Kaggle for reproducibility.
+
+### Kaggle Notebooks
+
+- ### Kaggle Notebooks
+
+- **[Notebook 1 — Dataset Forensics & Problem Understanding](https://www.kaggle.com/code/parmindersingh2002/notebook-1-dataset-forensics-problem-understand)**
+
+- **[Notebook 2 — Offline Index Builder (Embeddings + FAISS Generation](https://www.kaggle.com/code/parmindersingh2002/notebook-2-offline-index-builder)**
+
+### Original Challenge Dataset
+
+- **[Redrob AI India Runs Data & AI Challenge Dataset](https://www.kaggle.com/datasets/parmindersingh2002/redrob-ai-india-runs-hackathon-dataset)**
 
 ---
 
