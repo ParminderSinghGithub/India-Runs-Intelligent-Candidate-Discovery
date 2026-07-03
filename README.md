@@ -17,9 +17,9 @@ validated submission CSV with recruiter-ready explanations.
 ## Demo
 
 > **Run locally:** `streamlit run app.py`
-
+<!-- 
 <!-- Demo PNG: screenshot/mockup of the dashboard app -->
-![RedrobAI Intelligent Candidate Discovery Demo](docs/demo_placeholder.png)
+![RedrobAI Intelligent Candidate Discovery Demo](docs/demo_placeholder.png) -->
 
 The Streamlit app provides:
 - Upload a custom job description JSON **or** use the bundled challenge JD
