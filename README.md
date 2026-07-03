@@ -15,20 +15,27 @@ pinned: false
 [![Track 1](https://img.shields.io/badge/India%20Runs-Track%201-6366f1)](https://indiaruns.redrob.ai)
 [![FAISS](https://img.shields.io/badge/index-FAISS%20IndexFlatIP-22d3ee)](https://faiss.ai)
 
-> **India Runs Data &amp; AI Challenge · Track 1 — Ranking Track**
+## 🚀 Live Demo
 
-A fully deterministic, retrieval-augmented intelligent candidate discovery pipeline that
-scores 100+ shortlisted candidates against a job description and produces a
-validated submission CSV with recruiter-ready explanations.
+Hugging Face Space:
+
+[Redrob AI Candidate Ranking Demo](https://huggingface.co/spaces/ParminderzHuggingFace/redrob-ai-candidate-ranking)
+
+---
+
+AI-powered candidate discovery system built for the Redrob AI India Runs Data & AI Challenge (Track 1).
+
+The pipeline uses semantic retrieval via a FAISS vector index to pull candidate profiles matching a job description. Retrieved profiles are then evaluated using a hybrid deterministic scoring mechanism that weighs career relevance, skill matches, behavioral signals, profile consistency, and semantic similarity. Finally, the system automatically generates structured recruiter-ready explanations justifying each ranking.
 
 ---
 
 ## Demo
 
 > **Run locally:** `streamlit run app.py`
-<!-- 
-<!-- Demo PNG: screenshot/mockup of the dashboard app -->
-![RedrobAI Intelligent Candidate Discovery Demo](docs/demo_placeholder.png) -->
+
+### Demo Preview
+
+![Recruiter Dashboard Demo](demo.gif)
 
 The Streamlit app provides:
 - Upload a custom job description JSON **or** use the bundled challenge JD
@@ -37,6 +44,7 @@ The Streamlit app provides:
 - Plotly charts: score distribution, component averages, top industries, experience spread
 - Per-candidate score breakdown with matched/missing evidence tags
 - Download: `submission.csv` · `submission.xlsx` · `ranking.json` · `pipeline_report.json`
+- Live deployment on Hugging Face Spaces
 
 ---
 
@@ -49,11 +57,15 @@ The Streamlit app provides:
 | Top score | 0.8759 |
 | Score range | 0.4266 – 0.8759 |
 | Retrieval time | 1.8 s |
-| Re-ranking time | 18 s |
+| Hybrid scoring time | 18 s |
 | Total runtime | **~20 s** |
 | Unique explanations | 100 / 100 |
 | Submission validation | **PASS** (23/23 checks) |
 | Pipeline validator | **PASS** (23/23 checks) |
+
+**Ranking Strategy**
+
+FAISS semantic retrieval → Hybrid scoring → Deterministic explanation generation.
 
 ---
 
@@ -248,16 +260,14 @@ What this does:
 
 ### Automated Artifact Delivery
 
-To keep the GitHub repository clean and lightweight, the large pre-computed search index files (totaling ~325 MB) are stored in the Hugging Face Dataset registry rather than being checked into Git history:
-- **Registry**: [ParminderzHuggingFace/india-runs-faiss-artifacts](https://huggingface.co/datasets/ParminderzHuggingFace/india-runs-faiss-artifacts)
-- **Artifacts**: `faiss.index`, `candidate_lookup.pkl`, `embedding_metadata.pkl`
+The application automatically downloads the required artifacts—including the FAISS index, candidate lookup, embedding metadata, and candidates.jsonl—using the built-in `ArtifactManager`.
 
-On the first launch of `rank.py` or the Streamlit `app.py`, the system's `ArtifactManager` will automatically:
-1. Detect any missing files in `artifacts/faiss/`.
-2. Download only the missing files directly from Hugging Face.
-3. Skip already existing files to save startup time.
+These files are retrieved directly from the following Hugging Face datasets:
+- **FAISS Index & Metadata**: [ParminderzHuggingFace/india-runs-faiss-artifacts](https://huggingface.co/datasets/ParminderzHuggingFace/india-runs-faiss-artifacts)
 
-No manual artifact copying, downloading, or extraction is needed! Additionally, `candidates.jsonl` is automatically downloaded from `ParminderzHuggingFace/india-runs-candidates`.
+- **Candidate Dataset**: [ParminderzHuggingFace/india-runs-candidates](https://huggingface.co/datasets/ParminderzHuggingFace/india-runs-candidates)
+
+No manual downloads or configuration are required to set up the runtime data.
 
 ---
 
@@ -353,7 +363,7 @@ python rank.py --job job_description.json
 
 All timings measured on a CPU-only machine (no GPU):
 
-| Stage | Typical Time |
+| Stage | CPU Runtime |
 |---|---|
 | FAISS retrieval (top-100) | &lt;2 s |
 | Hybrid re-ranking (100 candidates) | 15–25 s |
