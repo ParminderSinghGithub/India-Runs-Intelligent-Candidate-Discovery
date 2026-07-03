@@ -307,3 +307,8 @@ HF_DATASET_REVISION: Final[str] = "main"
 HF_ARTIFACT_DIR: Final[Path] = ARTIFACTS_DIR / "faiss"
 HF_DOWNLOAD_TIMEOUT: Final[int] = 300
 HF_FORCE_DOWNLOAD: Final[bool] = False
+
+# Candidate database deployment configuration
+HF_CANDIDATE_DATASET_REPO: Final[str] = "ParminderzHuggingFace/india-runs-candidates"
+HF_CANDIDATE_DATASET_REVISION: Final[str] = "main"
+HF_CANDIDATE_FILENAME: Final[str] = "candidates.jsonl"

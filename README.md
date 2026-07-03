@@ -257,7 +257,7 @@ On the first launch of `rank.py` or the Streamlit `app.py`, the system's `Artifa
 2. Download only the missing files directly from Hugging Face.
 3. Skip already existing files to save startup time.
 
-No manual artifact copying, downloading, or extraction is needed!
+No manual artifact copying, downloading, or extraction is needed! Additionally, `candidates.jsonl` is automatically downloaded from `ParminderzHuggingFace/india-runs-candidates`.
 
 ---
 
