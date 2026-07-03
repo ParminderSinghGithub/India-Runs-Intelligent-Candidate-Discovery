@@ -10,9 +10,9 @@ pinned: false
 # RedrobAI — India Runs Intelligent Candidate Discovery System
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/demo-Streamlit-FF4B4B?logo=streamlit)](./app.py)
+[![Streamlit](https://img.shields.io/badge/demo-Streamlit-FF4B4B?logo=streamlit)](https://huggingface.co/spaces/ParminderzHuggingFace/redrob-ai-candidate-ranking)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Track 1](https://img.shields.io/badge/India%20Runs-Track%201-6366f1)](https://indiaruns.redrob.ai)
+[![Track 1](https://img.shields.io/badge/India%20Runs-Track%201-6366f1)](https://hack2skill.com/event/india_runs/)
 [![FAISS](https://img.shields.io/badge/index-FAISS%20IndexFlatIP-22d3ee)](https://faiss.ai)
 
 ## 🚀 Live Demo
